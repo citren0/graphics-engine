@@ -1,10 +1,10 @@
 
-CC=gcc
-CFLAGS= -g -O0
+CC=g++
+CFLAGS= -g -O0 -lX11
 
 LIBS=-lm
 
-FILES=main.c ./implementations/display.c ./implementations/transforms.c ./implementations/utils.c
+FILES=main.cpp ./implementations/display.cpp ./implementations/transforms.cpp ./implementations/utils.cpp
 
 all:
 	$(CC) $(CFLAGS) $(FILES) $(LIBS)

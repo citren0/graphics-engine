@@ -1,11 +1,9 @@
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <unistd.h>
-#include <math.h>
+#include <iostream>
+#include <string>
+#include <cmath>
 
-#include "../include/utils.h"
+#include "../include/utils.hpp"
 
 
 void initShape(struct shape * target)
@@ -38,15 +36,19 @@ int addVertexToShape(struct shape * target, struct location point)
     target->vectors[target->numVertices][3] = 1;
 
     target->numVertices++;
+
+    return 0;
 }
 
 int addConnectionToShape(struct shape * target, int source, int destination)
 {
     target->connectivity[source][destination] = 1;
+
+    return 0;
 }
 
 
-void copyMatrix(float source[][4], float dest[][4], int n)
+void copyMatrix(double source[][4], double dest[][4], int n)
 {
     for (int i = 0; i < 4; i++)
     {
@@ -59,9 +61,9 @@ void copyMatrix(float source[][4], float dest[][4], int n)
 
 
 // optimize
-void matMatMult(float operation[4][4], float target[][4], float destination[][4], int n)
+void matMatMult(double operation[4][4], double target[][4], double destination[][4], int n)
 {
-    float result[MAX_VERTICES_PER_SHAPE][4];
+    double result[MAX_VERTICES_PER_SHAPE][4];
 
     for (int i = 0; i < n; i++)
     {
@@ -80,7 +82,7 @@ void matMatMult(float operation[4][4], float target[][4], float destination[][4]
 }
 
 
-void printMat(float mat[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
+void printMat(double mat[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
 {
     for (int i = 0; i < NUMBER_OF_HOMOGENEOUS_COORDS; i++)
     {

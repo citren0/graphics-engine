@@ -1,7 +1,7 @@
 #pragma once
-#include "utils.h"
+#include "utils.hpp"
 
-void scaleHomogenous(float source[][4], int n);
+void scaleHomogenous(double source[][4], int n);
 
 void moveShapeLeft(struct shape * target);
 
@@ -15,7 +15,7 @@ void moveShapeIn(struct shape * target);
 
 void moveShapeOut(struct shape * target);
 
-void calculateCenterOfVertices(float vert1[4], float vert2[4], float result[3]);
+void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3]);
 
 void rotateShapeCCW(struct shape * target, struct location center, struct axis axisOfRotation);
 
