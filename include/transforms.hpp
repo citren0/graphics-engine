@@ -1,22 +1,25 @@
 #pragma once
 #include "utils.hpp"
+#include <vector>
+
+using namespace std;
 
 void scaleHomogenous(double source[][4], int n);
 
-void moveShapeLeft(struct shape * target);
+void moveShapesLeft(vector<struct shape *> targets);
 
-void moveShapeRight(struct shape * target);
+void moveShapesRight(vector<struct shape *> targets);
 
-void moveShapeUp(struct shape * target);
+void moveShapesUp(vector<struct shape *> targets);
 
-void moveShapeDown(struct shape * target);
+void moveShapesDown(vector<struct shape *> targets);
 
-void moveShapeIn(struct shape * target);
+void moveShapesIn(vector<struct shape *> targets);
 
-void moveShapeOut(struct shape * target);
+void moveShapesOut(vector<struct shape *> targets);
 
 void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3]);
 
-void rotateShapeCCW(struct shape * target, struct location center, struct axis axisOfRotation);
+void rotateShapesCCW(struct shape * target, struct location center, struct axis axisOfRotation);
 
-void rotateShapeCW(struct shape * target, struct location center);
+void rotateShapesCW(struct shape * target, struct location center, struct axis axisOfRotation);

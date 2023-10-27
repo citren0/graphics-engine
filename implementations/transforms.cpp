@@ -2,9 +2,12 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <vector>
 
 #include "../include/transforms.hpp"
 #include "../include/utils.hpp"
+
+using namespace std;
 
 void scaleHomogenous(double source[][4], int n)
 {
@@ -20,7 +23,7 @@ void scaleHomogenous(double source[][4], int n)
 // TODO change so matrix is put in right place
 // make the factor of movement changeable.
 
-void moveShapeLeft(struct shape * target)
+void moveShapesLeft(vector<struct shape *> targets)
 {
     // Matrices are stored with the vertical vectors contiguous in memory.
     double operation[4][4] = {{ 1, 0, 0, 0},
@@ -28,57 +31,109 @@ void moveShapeLeft(struct shape * target)
                              { 0, 0, 1, 0},
                              {-1, 0, 0, 1}};
 
-    //matMatMult(operation, target->vectors, target->numVertices);
+    int numTargets = targets.size();
+    
+    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+
+    for (int i = 0; i < numTargets; i++)
+    {
+        // TODO - make num vertices not matter.
+        
+        // Transform 1
+        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
+        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
+    }
 }
 
-void moveShapeRight(struct shape * target)
+void moveShapesRight(vector<struct shape *> targets)
 {
     double operation[4][4] = {{ 1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 1, 0, 0, 1}};
 
-    //matMatMult(operation, target->vectors, target->numVertices);
+    int numTargets = targets.size();
+    for (int i = 0; i < numTargets; i++)
+    {
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
+        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
+    }
 }
 
-void moveShapeUp(struct shape * target)
+void moveShapesUp(vector<struct shape *> targets)
 {
     double operation[4][4] = {{ 1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 1, 0, 1}};
 
-    //matMatMult(operation, target->vectors, target->numVertices);
+    int numTargets = targets.size();
+    for (int i = 0; i < numTargets; i++)
+    {
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
+        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
+    }
 }
 
-void moveShapeDown(struct shape * target)
+void moveShapesDown(vector<struct shape *> targets)
 {
     double operation[4][4] = {{ 1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0,-1, 0, 1}};
 
-    //matMatMult(operation, target->vectors, target->numVertices);
+    int numTargets = targets.size();
+    for (int i = 0; i < numTargets; i++)
+    {
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
+        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
+    }
 }
 
-void moveShapeIn(struct shape * target)
+void moveShapesIn(vector<struct shape *> targets)
 {
     double operation[4][4] = {{ 1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 0, 1, 1}};
 
-    //matMatMult(operation, target->vectors, target->numVertices);
+    int numTargets = targets.size();
+    for (int i = 0; i < numTargets; i++)
+    {
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
+        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
+    }
 }
 
-void moveShapeOut(struct shape * target)
+void moveShapesOut(vector<struct shape *> targets)
 {
     double operation[4][4] = {{ 1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 0,-1, 1}};
 
-    //matMatMult(operation, target->vectors, target->numVertices);
+
+    int numTargets = targets.size();
+    for (int i = 0; i < numTargets; i++)
+    {
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
+        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
+    }
 }
 
 
@@ -93,9 +148,9 @@ void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3
 
 
 // Rotate the shape around (h,k)
-void rotateShapeCCW(struct shape * target, struct location center, struct axis axisOfRotation)
+void rotateShapesCCW(struct shape * target, struct location center, struct axis axisOfRotation)
 {
-    double thetaRads = PI/36.0;
+    double thetaRads = PI/72.0;
 
     if (axisOfRotation.z)
     {
@@ -173,24 +228,79 @@ void rotateShapeCCW(struct shape * target, struct location center, struct axis a
 }
 
 
-void rotateShapeCW(struct shape * target, struct location center)
+void rotateShapesCW(struct shape * target, struct location center, struct axis axisOfRotation)
 {
-    double thetaRads = PI/36;
+    double thetaRads = -PI/72.0;
 
-    double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
-    double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+    if (axisOfRotation.z)
+    {
+        double rotMat[4][4] = {{cos(thetaRads), sin(thetaRads), 0, 0}, 
+                            {-sin(thetaRads), cos(thetaRads), 0, 0},
+                            {0, 0, 1, 0},
+                            {0, 0, 0, 1}};
+        
+        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
+        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
 
-    double rotMat[4][4] = {{cos(thetaRads), 0, -sin(thetaRads), 0}, 
-                        {0, 1, 0, 0},
-                        {sin(thetaRads), 0, cos(thetaRads), 0},
-                        {0, 0, 0, 1}};
+        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
+        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
 
-    
 
-    // Transform 1
-    //matMatMult(trans1, target->vectors, target->numVertices);
-    // Transform 2
-    //matMatMult(rotMat, target->vectors, target->numVertices);
-    // Transform 3
-    //matMatMult(trans3, target->vectors, target->numVertices);
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(trans1, target->vectors, buf, target->numVertices);
+        // Transform 2
+        matMatMult(rotMat, buf, buf, target->numVertices);
+        // Transform 3
+        matMatMult(trans3, buf, target->vectors, target->numVertices);
+    }
+    else if (axisOfRotation.x)
+    {
+        double rotMat[4][4] = {{1, 0, 0, 0}, 
+                            {0, cos(thetaRads), sin(thetaRads), 0},
+                            {0, -sin(thetaRads), cos(thetaRads), 0},
+                            {0, 0, 0, 1}};
+        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
+        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+
+        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
+        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
+
+
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(trans1, target->vectors, buf, target->numVertices);
+        // Transform 2
+        matMatMult(rotMat, buf, buf, target->numVertices);
+        // Transform 3
+        matMatMult(trans3, buf, target->vectors, target->numVertices);
+    }
+    else if (axisOfRotation.y)
+    {
+        double rotMat[4][4] = {{cos(thetaRads), 0, -sin(thetaRads), 0}, 
+                            {0, 1, 0, 0},
+                            {sin(thetaRads), 0, cos(thetaRads), 0},
+                            {0, 0, 0, 1}};
+        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
+        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+
+        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
+        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
+
+
+        // TODO make num vertices not matter.
+        double buf[4][4];
+        // Transform 1
+        matMatMult(trans1, target->vectors, buf, target->numVertices);
+        // Transform 2
+        matMatMult(rotMat, buf, buf, target->numVertices);
+        // Transform 3
+        matMatMult(trans3, buf, target->vectors, target->numVertices);
+    }
+    else
+    {
+        return;
+    }
 }

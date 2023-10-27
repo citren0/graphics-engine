@@ -12,6 +12,7 @@ void initShape(struct shape * target)
     
     for (int i = 0; i < MAX_VERTICES_PER_SHAPE; i++)
     {
+        // Initialize each vertex to all zeroes.
         for (int f = 0; f < MAX_VERTICES_PER_SHAPE; f++)
         {
             target->connectivity[i][f] = 0;
@@ -25,15 +26,17 @@ void initShape(struct shape * target)
 
 int addVertexToShape(struct shape * target, struct location point)
 {
+    // Cannot add another vertex to a shape with the max number of vertices.
     if (target->numVertices >= MAX_VERTICES_PER_SHAPE)
     {
         return 1;
     }
 
-    target->vectors[target->numVertices][0] = point.x;
-    target->vectors[target->numVertices][1] = point.y;
-    target->vectors[target->numVertices][2] = point.z;
-    target->vectors[target->numVertices][3] = 1;
+    int numVertices = target->numVertices;
+    target->vectors[numVertices][0] = point.x;
+    target->vectors[numVertices][1] = point.y;
+    target->vectors[numVertices][2] = point.z;
+    target->vectors[numVertices][3] = 1;
 
     target->numVertices++;
 
@@ -48,9 +51,9 @@ int addConnectionToShape(struct shape * target, int source, int destination)
 }
 
 
-void copyMatrix(double source[][4], double dest[][4], int n)
+void copyMatrix(double source[][NUMBER_OF_HOMOGENEOUS_COORDS], double dest[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
 {
-    for (int i = 0; i < 4; i++)
+    for (int i = 0; i < NUMBER_OF_HOMOGENEOUS_COORDS; i++)
     {
         for (int f = 0; f < n; f++)
         {
@@ -61,17 +64,19 @@ void copyMatrix(double source[][4], double dest[][4], int n)
 
 
 // optimize
-void matMatMult(double operation[4][4], double target[][4], double destination[][4], int n)
+void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS], double target[][NUMBER_OF_HOMOGENEOUS_COORDS], double destination[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
 {
-    double result[MAX_VERTICES_PER_SHAPE][4];
+    // TODO - In-place matrix multiplication.
+    
+    double result[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
 
     for (int i = 0; i < n; i++)
     {
-        for (int f = 0; f < 4; f++)
+        for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
         {
             result[i][f] = 0;
 
-            for (int j = 0; j < 4; j++)
+            for (int j = 0; j < NUMBER_OF_HOMOGENEOUS_COORDS; j++)
             {
                 result[i][f] += operation[j][f] * target[i][j];
             }

@@ -1,8 +1,8 @@
 
 CC=g++
-CFLAGS= -g -O0 -lX11
+CFLAGS= -g -Og
 
-LIBS=-lm
+LIBS=-lm -lX11 -lXext -lcurses
 
 FILES=main.cpp ./implementations/display.cpp ./implementations/transforms.cpp ./implementations/utils.cpp
 

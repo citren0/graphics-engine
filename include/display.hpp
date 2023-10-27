@@ -2,8 +2,8 @@
 #include "utils.hpp"
 #include <vector>
 
-#define SCREENWIDTH 1500
-#define SCREENHEIGHT 1500
+#define SCREENWIDTH 1600
+#define SCREENHEIGHT 1200
 #define MAXCONNECTIONS 4
 
 #define dist(x1,y1,x2,y2) sqrtf(powf(x2-x1, 2) + powf(y2-y1, 2))
