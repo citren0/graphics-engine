@@ -6,24 +6,22 @@
 #include "../include/display.hpp"
 #include "../include/transforms.hpp"
 
+// Field of View in degrees
 #define fov 45.0
 
+// Coefficient for projection matrix
 #define S 1.0/(tan(fov*0.5*PI/180.0))
 
+// Far and near clipping planes
 #define far 100.0
 #define near 0.1
-
-#define left -1.0
-#define right 1.0
-#define top 1.0
-#define bottom -1.0
 
 
 double projMat[4][4] = {{S, 0, 0, 0},{0, S, 0, 0},{0, 0, -(far+near)/(far-near), -1},{0, 0, (-2.0 * far * near)/(far-near), 0}};
 
 
 
-void initBuf(char buf[SCREENHEIGHT][SCREENWIDTH])
+void initBuffer(char buf[SCREENHEIGHT][SCREENWIDTH])
 {
     for (int i = 0; i < SCREENHEIGHT; i++)
     {
@@ -39,56 +37,62 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 {
     int numShapes = shapes.size();
 
-    char buf[SCREENHEIGHT][SCREENWIDTH];
+    char pixels[SCREENHEIGHT][SCREENWIDTH];
 
-    initBuf(buf);
+    initBuffer(pixels);
 
+    // Must calculate pixel location of each vertex and the connections between.
     for (int index = 0; index < numShapes; index++)
     {
-        // TODO  make number of vertices not matter.
-        double homogCurr[4][4];
+        // TODO - make number of vertices not matter.
+        
 
         struct shape * currShape = shapes[index];
-
-        matMatMult(projMat, currShape->vectors, homogCurr, 4);
-        scaleHomogenous(homogCurr, 4);
-
-
-
         int n = currShape->numVertices;
+
+        double homogCurr[n][NUMBER_OF_HOMOGENEOUS_COORDS];
+
+
+        matMatMult(projMat, currShape->vectors, homogCurr, n);
+        scaleHomogenous(homogCurr, n);
+
+        
         for (int i = 0; i < n; i++)
         {
             double unscaledX = homogCurr[i][0];
             double unscaledY = homogCurr[i][1];
 
+            // Leave a small margin on each side of the display.
             if (unscaledX > 0.95 || unscaledX < -0.95 || unscaledY > 0.95 || unscaledY < -0.95)
             {
                 continue;
             }
-            int x = (int)((unscaledX*(SCREENWIDTH/2)) + (SCREENWIDTH/2));
-            int y = (int)((unscaledY*(SCREENHEIGHT/2)) + (SCREENHEIGHT/2));
-            buf[y][x] = 1;
+            
+            // Unscaled coordinates are on the interval [-1,1]
+            int x = scaleX(unscaledX);
+            int y = scaleY(unscaledY);
+
+            pixels[y][x] = 1;
         }
 
-        // Draw lines
-        for (int i = 0; i < n; i++)
+        // Draw connection lines from vertex 'from' to vertex 'to'
+        for (int from = 0; from < n; from++)
         {
-            for (int f = 0; f < n; f++)
+            for (int to = 0; to < n; to++)
             {
-                if (currShape->connectivity[i][f] == 1)
+                if (currShape->connectivity[from][to] == 1)
                 {
-                    // points i and f are connected.
+                    // points 'from' and 'to' are connected.
 
-                    double pixelDistance = dist(homogCurr[i][0]*(SCREENWIDTH), homogCurr[i][1]*(SCREENHEIGHT), homogCurr[f][0]*(SCREENWIDTH), homogCurr[f][1]*SCREENHEIGHT);
-                    double deltaX = homogCurr[f][0] - homogCurr[i][0];
-                    double deltaY = homogCurr[f][1] - homogCurr[i][1];
+                    double pixelDistance = dist(homogCurr[from][0]*(SCREENWIDTH), homogCurr[from][1]*(SCREENHEIGHT), homogCurr[to][0]*(SCREENWIDTH), homogCurr[to][1]*SCREENHEIGHT);
+
+                    double deltaX = homogCurr[to][0] - homogCurr[from][0];
+                    double deltaY = homogCurr[to][1] - homogCurr[from][1];
                     
-                    // truncate as thats what we do to all coordinates for now.
+                    double unscaledX = homogCurr[from][0];
+                    double unscaledY = homogCurr[from][1];
 
-                    double unscaledX = homogCurr[i][0];
-                    double unscaledY = homogCurr[i][1];
-
-                    for (int i = 0; i < pixelDistance; i++)
+                    for (int from = 0; from < pixelDistance; from++)
                     {
                         unscaledX += deltaX/pixelDistance;
 
@@ -96,12 +100,12 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 
                         if (unscaledX < 0.95 && unscaledX > -0.95 && unscaledY < 0.95 && unscaledY > -0.95)
                         {
-                            int x = (int)((unscaledX*(SCREENWIDTH/2)) + (SCREENWIDTH/2));
-                            int y = (int)((unscaledY*(SCREENHEIGHT/2)) + (SCREENHEIGHT/2));
+                            int x = scaleX(unscaledX);
+                            int y = scaleY(unscaledY);
 
-                            if (buf[y][x] != 1)
+                            if (pixels[y][x] != 1)
                             {
-                                buf[y][x] = 2;
+                                pixels[y][x] = 2;
                             }
                         }
 
@@ -115,64 +119,26 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 
     }
 
-
-
-
-
-
+    // Set color values in framebuffer according to pixel values.
     for (int row = 0; row < SCREENHEIGHT; row++)
     {
         for (int col = 0; col < SCREENWIDTH; col++)
         {
-            if (buf[row][col] == 1 || buf[row][col] == 2)
+            int arrayPosition = row * SCREENWIDTH + col;
+
+            if (pixels[row][col] == 1)
             {
-                framebuf[row*SCREENWIDTH + col] = 0xFFFFFFFF;
+                framebuf[arrayPosition] = 0xFFFFFFFF;
+            }
+            else if (pixels[row][col] == 2)
+            {
+                framebuf[arrayPosition] = 0xFF0000FF;
             }
             else
             {
-                framebuf[row*SCREENWIDTH + col] = 0x00000000;
+                framebuf[arrayPosition] = 0x00000000;
             }
         }
     }
 
-
-
-
-
-
-    // printf(" ");
-    // for (int i = 0; i < SCREENWIDTH; i++)
-    // {
-    //     printf("-");
-    // }
-    // printf("\n");
-
-    // for (int i = 0; i < SCREENHEIGHT; i++)
-    // {
-    //     printf("|");
-    //     for (int f = 0; f < SCREENWIDTH; f++)
-    //     {
-    //         if (buf[i][f] == 1)
-    //         {
-    //             printf("#");
-    //         }
-    //         else if (buf[i][f] == 2)
-    //         {
-    //             printf("·");
-    //         }
-    //         else
-    //         {
-    //             printf(" ");
-    //         }
-
-    //     }
-    //     printf("|\n");
-    // }
-
-    // printf(" ");
-    // for (int i = 0; i < SCREENWIDTH; i++)
-    // {
-    //     printf("-");
-    // }
-    // printf("\n");
 }

@@ -9,6 +9,7 @@
 
 using namespace std;
 
+
 void scaleHomogenous(double source[][4], int n)
 {
     for (int i = 0; i < n; i++)
@@ -20,9 +21,9 @@ void scaleHomogenous(double source[][4], int n)
     }
 }
 
+
 // TODO change so matrix is put in right place
 // make the factor of movement changeable.
-
 void moveShapesLeft(vector<struct shape *> targets)
 {
     // Matrices are stored with the vertical vectors contiguous in memory.
@@ -38,12 +39,11 @@ void moveShapesLeft(vector<struct shape *> targets)
     for (int i = 0; i < numTargets; i++)
     {
         // TODO - make num vertices not matter.
-        
-        // Transform 1
         matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
         copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
     }
 }
+
 
 void moveShapesRight(vector<struct shape *> targets)
 {
@@ -53,15 +53,17 @@ void moveShapesRight(vector<struct shape *> targets)
                              { 1, 0, 0, 1}};
 
     int numTargets = targets.size();
+
+    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+
     for (int i = 0; i < numTargets; i++)
     {
         // TODO make num vertices not matter.
-        double buf[4][4];
-        // Transform 1
         matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
         copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
     }
 }
+
 
 void moveShapesUp(vector<struct shape *> targets)
 {
@@ -71,15 +73,17 @@ void moveShapesUp(vector<struct shape *> targets)
                              { 0, 1, 0, 1}};
 
     int numTargets = targets.size();
+
+    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+
     for (int i = 0; i < numTargets; i++)
     {
         // TODO make num vertices not matter.
-        double buf[4][4];
-        // Transform 1
         matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
         copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
     }
 }
+
 
 void moveShapesDown(vector<struct shape *> targets)
 {
@@ -89,15 +93,17 @@ void moveShapesDown(vector<struct shape *> targets)
                              { 0,-1, 0, 1}};
 
     int numTargets = targets.size();
+
+    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+
     for (int i = 0; i < numTargets; i++)
     {
         // TODO make num vertices not matter.
-        double buf[4][4];
-        // Transform 1
         matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
         copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
     }
 }
+
 
 void moveShapesIn(vector<struct shape *> targets)
 {
@@ -107,15 +113,17 @@ void moveShapesIn(vector<struct shape *> targets)
                              { 0, 0, 1, 1}};
 
     int numTargets = targets.size();
+
+    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+
     for (int i = 0; i < numTargets; i++)
     {
         // TODO make num vertices not matter.
-        double buf[4][4];
-        // Transform 1
         matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
         copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
     }
 }
+
 
 void moveShapesOut(vector<struct shape *> targets)
 {
@@ -126,16 +134,16 @@ void moveShapesOut(vector<struct shape *> targets)
 
 
     int numTargets = targets.size();
+
+    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+    
     for (int i = 0; i < numTargets; i++)
     {
         // TODO make num vertices not matter.
-        double buf[4][4];
-        // Transform 1
         matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
         copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
     }
 }
-
 
 
 // Will calculate the 3D center of two vertices.
@@ -162,9 +170,6 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
         double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
         double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
 
-        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
-        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
-
 
         // TODO make num vertices not matter.
         double buf[4][4];
@@ -184,9 +189,6 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
         double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
         double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
 
-        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
-        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
-
 
         // TODO make num vertices not matter.
         double buf[4][4];
@@ -205,9 +207,6 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
                             {0, 0, 0, 1}};
         double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
         double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
-
-        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
-        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
 
 
         // TODO make num vertices not matter.
@@ -242,9 +241,6 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
         double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
         double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
 
-        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
-        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
-
 
         // TODO make num vertices not matter.
         double buf[4][4];
@@ -264,9 +260,6 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
         double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
         double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
 
-        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
-        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
-
 
         // TODO make num vertices not matter.
         double buf[4][4];
@@ -285,9 +278,6 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
                             {0, 0, 0, 1}};
         double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
         double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
-
-        //double trans1[4][4] = {{1, 0, 0, -center.x}, {0, 1, 0, -center.y}, {0, 0, 1, -center.z}, {0, 0, 0, 1}};
-        //double trans3[4][4] = {{1, 0, 0, center.x}, {0, 1, 0, center.y}, {0, 0, 1, center.z}, {0, 0, 0, 1}};
 
 
         // TODO make num vertices not matter.
