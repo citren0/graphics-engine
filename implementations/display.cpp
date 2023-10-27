@@ -6,16 +6,6 @@
 #include "../include/display.hpp"
 #include "../include/transforms.hpp"
 
-// Field of View in degrees
-#define fov 45.0
-
-// Coefficient for projection matrix
-#define S 1.0/(tan(fov*0.5*PI/180.0))
-
-// Far and near clipping planes
-#define far 100.0
-#define near 0.1
-
 
 double projMat[4][4] = {{S, 0, 0, 0},{0, S, 0, 0},{0, 0, -(far+near)/(far-near), -1},{0, 0, (-2.0 * far * near)/(far-near), 0}};
 

@@ -1,5 +1,8 @@
 #pragma once
-#define PI 3.141592
+
+#define UNUSED(x) (void)x
+
+#define PI 3.14159265
 
 #define MAX_VERTICES_PER_SHAPE 4
 #define NUMBER_OF_HOMOGENEOUS_COORDS 4

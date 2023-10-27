@@ -1,10 +1,10 @@
 
 CC=g++
-CFLAGS= -g -Og
+CFLAGS= -g -Og -Wall -Werror -Wextra
 
-LIBS=-lm -lX11 -lXext -lcurses
+LIBS=-lm -lX11 -lXext
 
-FILES=main.cpp ./implementations/display.cpp ./implementations/transforms.cpp ./implementations/utils.cpp
+FILES=main.cpp ./implementations/display.cpp ./implementations/transforms.cpp ./implementations/utils.cpp ./implementations/window.cpp
 
 all:
 	$(CC) $(CFLAGS) $(FILES) $(LIBS)

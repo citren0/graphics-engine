@@ -6,161 +6,34 @@
 #include <vector>
 #include <chrono>
 
-// X11 libraries
-#include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/Xos.h>
-
-#include <sys/ipc.h>
-#include <sys/shm.h>
-#include <X11/extensions/XShm.h>
 
 #include "./include/display.hpp"
 #include "./include/utils.hpp"
 #include "./include/transforms.hpp"
+#include "./include/window.hpp"
 
-#include <curses.h>
 
 #define MAXSHAPES 10
 
 #define FRAMETIME 30000
 
-int * framebuf;
-XSetWindowAttributes attrs;
-Window parent;
-Visual *visual;
-Window win;
-XImage *ximage;
-XEvent event;
-Display *dpy;
-XVisualInfo vinfo;
-int depth;
-XVisualInfo *visual_list;
-XVisualInfo visual_template;
-int nxvisuals;
-GC NormalGC;
-XShmSegmentInfo shminfo;
-XGCValues gcv;
-unsigned long gcm;
 
 
-static int HandleXError( Display *dpy, XErrorEvent *event )
-{
-    printf("errorrorororor");
-    exit(1);
-}
-
-void init_x() 
-{
-
-    int i;
-
-    dpy = XOpenDisplay(NULL);
-
-    nxvisuals = 0;
-    visual_template.screen = DefaultScreen(dpy);
-    visual_list = XGetVisualInfo(dpy, VisualScreenMask, &visual_template, &nxvisuals);
-
-
-    if (!XMatchVisualInfo(dpy, XDefaultScreen(dpy), 24, TrueColor, &vinfo))
-    {
-        fprintf(stderr, "no such visual\n");
-        return;
-    }
-
-    parent = XDefaultRootWindow(dpy);
-
-    XSync(dpy, True);
-
-    printf("creating RGBA child\n");
-
-    visual = vinfo.visual;
-    depth = vinfo.depth;
-
-    attrs.colormap = XCreateColormap(dpy, XDefaultRootWindow(dpy), visual, AllocNone);
-    attrs.background_pixel = 0;
-    attrs.border_pixel = 0;
-
-    win = XCreateWindow(dpy, parent, 100, 100, SCREENWIDTH, SCREENHEIGHT, 0, depth, InputOutput,
-                        visual, CWBackPixel | CWColormap | CWBorderPixel, &attrs);
-
-
-
-    ximage = XShmCreateImage(dpy, vinfo.visual, depth, ZPixmap, NULL, &shminfo, SCREENWIDTH, SCREENHEIGHT); 
-
-    shminfo.shmid = shmget(IPC_PRIVATE, ximage->bytes_per_line * ximage->height, IPC_CREAT|0777);
-    shminfo.shmaddr = ximage->data = (char *)shmat(shminfo.shmid, 0, 0); 
-
-    if (shminfo.shmaddr <= (char *) 0)
-    {
-        printf("error");
-        exit(1);
-    }
-
-
-    shminfo.readOnly = False;
-
-    int ErrorFlag = 0;
-    XSetErrorHandler( HandleXError );
-
-    
-
-    
-    XShmAttach(dpy, &shminfo);
-
-    framebuf = (int *)shminfo.shmaddr;
-
-    if (ximage == 0)
-    {
-        printf("ximage is null!\n");
-        exit(1);
-    }
-
-    XSync(dpy, False);
-
-    XSelectInput(dpy, win, ExposureMask | KeyPressMask);
-
-
-       /* An error may still occur upon the first XShmPutImage.  So it's a */
-   /* good idea to test it here.  However, we need a window to put the */
-   /* image into, etc.... */
-   GC gc = XCreateGC( dpy, win, 0, NULL );
-   XShmPutImage( dpy, win, gc, ximage, 0, 0, 0, 0, 1, 1 /*one pixel*/, False );
-   XSync( dpy, False );
-   XFreeGC( dpy, gc );
-   XSetErrorHandler( NULL );
-   if (ErrorFlag) {
-      XFlush( dpy );
-      ErrorFlag = 0;
-      XDestroyImage( ximage );
-      shmdt( shminfo.shmaddr );
-      shmctl( shminfo.shmid, IPC_RMID, 0 );
-      exit(1);
-   }
-
-
-
-
-    gcm = GCGraphicsExposures;
-    gcv.graphics_exposures = 0;
-    NormalGC = XCreateGC(dpy, parent, gcm, &gcv);
-
-    XMapWindow(dpy, win);
-    XInternAtom(dpy, "WM_DELETE_WINDOW", False); 
-
-    printf("No error\n");
-
-
-}
-
+// TODO - SWITCH WINDOW TO CLASS
 
 
 int main(void)
 {
 
     XEvent event;
+    int * framebuf;
 
-    init_x();
+    X11Window window;
+
+    window.init_x();
+
+    framebuf = window.getFrameBuffer();
 
 
     std::vector<struct shape *> shapes;
@@ -203,10 +76,6 @@ int main(void)
 
     for (;;)
     {
-        
-        // char input;
-        // input = getch();
-        // system("clear");
 
         //XNextEvent(dpy, &event);
         int ks;
@@ -258,16 +127,15 @@ int main(void)
         // Create maximum framerate by timing and sleeping.
         auto start = std::chrono::high_resolution_clock::now();
 
-        displayVertices(shapes, (int *)ximage->data);
+        displayVertices(shapes, framebuf);
 
-        // XPutImage(dpy, win, NormalGC, ximage, 0, 0, 0, 0, SCREENWIDTH, SCREENHEIGHT);
-        XShmPutImage(dpy, win, NormalGC, ximage, 0, 0, 0, 0, SCREENWIDTH, SCREENHEIGHT, false);
-        XFlush(dpy);
+        window.putImage();
 
 
         auto stop = std::chrono::high_resolution_clock::now();
+
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << "Solution achieved " << (double)duration.count() / FRAMETIME << " efficiency." << std::endl;
+
         std::cout << "Slept for " << (double)duration.count() << " ms" << std::endl;
 
         usleep(duration.count() < FRAMETIME ? FRAMETIME-duration.count() : 0);
