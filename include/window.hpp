@@ -33,5 +33,6 @@ class X11Window
         void init_x();
         int * getFrameBuffer(void);
         void putImage(void);
+        Display * getDisplay(void);
 };
 

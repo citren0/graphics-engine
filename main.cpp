@@ -20,9 +20,6 @@
 
 
 
-// TODO - SWITCH WINDOW TO CLASS
-
-
 int main(void)
 {
 
@@ -77,13 +74,13 @@ int main(void)
     for (;;)
     {
 
-        //XNextEvent(dpy, &event);
+        XNextEvent(window.getDisplay(), &event);
         int ks;
         event.type = KeyPress;
         switch (event.type)
         {
             case KeyPress:
-                ks = XK_e;//XLookupKeysym(&(event.xkey), 0);
+                ks = XLookupKeysym(&(event.xkey), 0);
 
                 switch (ks)
                 {

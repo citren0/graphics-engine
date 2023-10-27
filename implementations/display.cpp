@@ -7,7 +7,10 @@
 #include "../include/transforms.hpp"
 
 
-double projMat[4][4] = {{S, 0, 0, 0},{0, S, 0, 0},{0, 0, -(far+near)/(far-near), -1},{0, 0, (-2.0 * far * near)/(far-near), 0}};
+double projMat[4][4] = {{S, 0, 0, 0},
+                        {0, S, 0, 0},
+                        {0, 0, -(far+near)/(far-near), -1},
+                        {0, 0, (-2.0 * far * near)/(far-near), 0}};
 
 
 

@@ -110,3 +110,8 @@ void X11Window::putImage(void)
     XShmPutImage(dpy, win, NormalGC, ximage, 0, 0, 0, 0, SCREENWIDTH, SCREENHEIGHT, false);
     XFlush(dpy);
 }
+
+Display * X11Window::getDisplay(void)
+{
+    return dpy;
+}
