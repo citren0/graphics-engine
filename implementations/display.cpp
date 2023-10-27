@@ -56,7 +56,7 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
             double unscaledY = homogCurr[i][1];
 
             // Leave a small margin on each side of the display.
-            if (unscaledX > 0.95 || unscaledX < -0.95 || unscaledY > 0.95 || unscaledY < -0.95)
+            if (!xInBounds(unscaledX) || !yInBounds(unscaledY))
             {
                 continue;
             }
@@ -79,29 +79,41 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 
                     double pixelDistance = dist(homogCurr[from][0]*(SCREENWIDTH), homogCurr[from][1]*(SCREENHEIGHT), homogCurr[to][0]*(SCREENWIDTH), homogCurr[to][1]*SCREENHEIGHT);
 
+                    // int start = from;
+
+                    // double unscaledXfrom = homogCurr[from][0];
+                    // double unscaledYfrom = homogCurr[from][1];
+
+                    // double unscaledXto = homogCurr[to][0];
+                    // double unscaledYto = homogCurr[to][1];
+
+                    // if (unsclaedXfrom)
+
                     double deltaX = homogCurr[to][0] - homogCurr[from][0];
                     double deltaY = homogCurr[to][1] - homogCurr[from][1];
                     
                     double unscaledX = homogCurr[from][0];
                     double unscaledY = homogCurr[from][1];
 
-                    for (int from = 0; from < pixelDistance; from++)
+                    for (int march = 0; march < pixelDistance; march++)
                     {
-                        unscaledX += deltaX/pixelDistance;
+                        unscaledX += (deltaX / pixelDistance);
 
-                        unscaledY += deltaY/pixelDistance;
+                        unscaledY += (deltaY / pixelDistance);
 
-                        if (unscaledX < 0.95 && unscaledX > -0.95 && unscaledY < 0.95 && unscaledY > -0.95)
+                        if (!xInBounds(unscaledX) || !yInBounds(unscaledY))
                         {
-                            int x = scaleX(unscaledX);
-                            int y = scaleY(unscaledY);
-
-                            if (pixels[y][x] != 1)
-                            {
-                                pixels[y][x] = 2;
-                            }
+                            continue;
                         }
 
+
+                        int x = scaleX(unscaledX);
+                        int y = scaleY(unscaledY);
+
+                        if (pixels[y][x] != 1)
+                        {
+                            pixels[y][x] = 2;
+                        }
                         
                     }
                     

@@ -21,6 +21,9 @@
 #define scaleX(x) (int)((x * (SCREENWIDTH / 2)) + (SCREENWIDTH / 2))
 #define scaleY(y) (int)((y * (SCREENHEIGHT / 2)) + (SCREENHEIGHT / 2))
 
+#define xInBounds(x) ((x < 0.95) && (x > -0.95))
+#define yInBounds(y) ((y < 0.95) && (y > -0.95))
+
 
 void initBuf(char buf[SCREENHEIGHT][SCREENWIDTH]);
 

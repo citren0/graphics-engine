@@ -37,7 +37,7 @@ void X11Window::init_x()
 
     if (!XMatchVisualInfo(dpy, XDefaultScreen(dpy), 24, TrueColor, &vinfo))
     {
-        fprintf(stderr, "no such visual\n");
+        fprintf(stderr, "visual not found.\n");
         return;
     }
 
@@ -45,7 +45,7 @@ void X11Window::init_x()
 
     XSync(dpy, True);
 
-    printf("creating RGBA child\n");
+    printf("creating rgba child.\n");
 
     visual = vinfo.visual;
     depth = vinfo.depth;
@@ -66,7 +66,7 @@ void X11Window::init_x()
 
     if (shminfo.shmaddr <= (char *) 0)
     {
-        printf("error");
+        printf("shmaddr error.");
         exit(1);
     }
 
@@ -78,7 +78,7 @@ void X11Window::init_x()
 
     if (ximage == 0)
     {
-        printf("ximage is null!\n");
+        printf("ximage is null.\n");
         exit(1);
     }
 
@@ -93,7 +93,7 @@ void X11Window::init_x()
     XMapWindow(dpy, win);
     XInternAtom(dpy, "WM_DELETE_WINDOW", False); 
 
-    printf("No error\n");
+    printf("Init succeeded.\n");
 
 
 }

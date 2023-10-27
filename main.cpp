@@ -45,6 +45,12 @@ int main(void)
     struct shape square2;
     initShape(&square2);
 
+    struct shape square3;
+    initShape(&square3);
+
+    struct shape square4;
+    initShape(&square4);
+
 
     addVertexToShape(&square1, (struct location){0, 0, 20});
     addVertexToShape(&square1, (struct location){5, 0, 20});
@@ -67,8 +73,32 @@ int main(void)
     addConnectionToShape(&square2, 2, 0);
     addConnectionToShape(&square2, 3, 2);
 
+
+    addVertexToShape(&square3, (struct location){0, 0, 15});
+    addVertexToShape(&square3, (struct location){5, 0, 20});
+    addVertexToShape(&square3, (struct location){0, 5, 20});
+    addVertexToShape(&square3, (struct location){5, 5, 15});
+
+    addConnectionToShape(&square3, 0, 1);
+    addConnectionToShape(&square3, 1, 3);
+    addConnectionToShape(&square3, 2, 0);
+    addConnectionToShape(&square3, 3, 2);
+
+
+    addVertexToShape(&square4, (struct location){0, 0, 20});
+    addVertexToShape(&square4, (struct location){5, 0, 15});
+    addVertexToShape(&square4, (struct location){0, 5, 15});
+    addVertexToShape(&square4, (struct location){5, 5, 20});
+
+    addConnectionToShape(&square4, 0, 1);
+    addConnectionToShape(&square4, 1, 3);
+    addConnectionToShape(&square4, 2, 0);
+    addConnectionToShape(&square4, 3, 2);
+
     shapes.push_back(&square1);
     shapes.push_back(&square2);
+    shapes.push_back(&square3);
+    shapes.push_back(&square4);
 
 
     for (;;)
@@ -105,10 +135,15 @@ int main(void)
                     case XK_q:
                         rotateShapesCW(&square1, center, a1);
                         rotateShapesCW(&square2, center, a1);
+                        rotateShapesCW(&square3, center, a1);
+                        rotateShapesCW(&square4, center, a1);
                         break;
                     case XK_e:
                         rotateShapesCCW(&square1, center, a1);
                         rotateShapesCCW(&square2, center, a1);
+                        rotateShapesCCW(&square3, center, a1);
+                        rotateShapesCCW(&square4, center, a1);
+                        
                         break;
                     default:
                         break;
