@@ -23,3 +23,6 @@ void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3
 void rotateShapesCCW(struct shape * target, struct location center, struct axis axisOfRotation);
 
 void rotateShapesCW(struct shape * target, struct location center, struct axis axisOfRotation);
+
+void pivotCameraPitch(vector<struct shape *> targets, double angle);
+void pivotCameraYaw(vector<struct shape *> targets, double angle);

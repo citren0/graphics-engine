@@ -41,6 +41,8 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
         
 
         struct shape * currShape = shapes[index];
+
+
         int n = currShape->numVertices;
 
         double homogCurr[n][NUMBER_OF_HOMOGENEOUS_COORDS];
@@ -49,7 +51,7 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
         matMatMult(projMat, currShape->vectors, homogCurr, n);
         scaleHomogenous(homogCurr, n);
 
-        
+        // Draw vertices of the shapes.
         for (int i = 0; i < n; i++)
         {
             double unscaledX = homogCurr[i][0];
@@ -79,21 +81,16 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 
                     double pixelDistance = dist(homogCurr[from][0]*(SCREENWIDTH), homogCurr[from][1]*(SCREENHEIGHT), homogCurr[to][0]*(SCREENWIDTH), homogCurr[to][1]*SCREENHEIGHT);
 
-                    // int start = from;
-
-                    // double unscaledXfrom = homogCurr[from][0];
-                    // double unscaledYfrom = homogCurr[from][1];
-
-                    // double unscaledXto = homogCurr[to][0];
-                    // double unscaledYto = homogCurr[to][1];
-
-                    // if (unsclaedXfrom)
-
                     double deltaX = homogCurr[to][0] - homogCurr[from][0];
                     double deltaY = homogCurr[to][1] - homogCurr[from][1];
                     
                     double unscaledX = homogCurr[from][0];
                     double unscaledY = homogCurr[from][1];
+
+                    if (!xInBounds(homogCurr[to][0]) && !xInBounds(homogCurr[from][0]) && !yInBounds(homogCurr[to][1]) && !yInBounds(homogCurr[from][1]))
+                    {
+                        continue;
+                    }
 
                     for (int march = 0; march < pixelDistance; march++)
                     {

@@ -2,7 +2,7 @@
 #include "utils.hpp"
 #include <vector>
 
-#define SCREENWIDTH 1600
+#define SCREENWIDTH 2000
 #define SCREENHEIGHT 1200
 #define MAXCONNECTIONS 4
 
@@ -10,10 +10,10 @@
 #define fov 45.0
 
 // Coefficient for projection matrix
-#define S 1.0/(tan(fov*0.5*PI/180.0))
+#define S 1/tan(fov*0.5*PI/180.0)
 
 // Far and near clipping planes
-#define far 100.0
+#define far 1.0
 #define near 0.1
 
 #define dist(x1,y1,x2,y2) sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))

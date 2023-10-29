@@ -27,10 +27,10 @@ void scaleHomogenous(double source[][4], int n)
 void moveShapesLeft(vector<struct shape *> targets)
 {
     // Matrices are stored with the vertical vectors contiguous in memory.
-    double operation[4][4] = {{ 1, 0, 0, 0},
+    double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
-                             {-1, 0, 0, 1}};
+                             { 1, 0, 0, 1}};
 
     int numTargets = targets.size();
     
@@ -47,10 +47,10 @@ void moveShapesLeft(vector<struct shape *> targets)
 
 void moveShapesRight(vector<struct shape *> targets)
 {
-    double operation[4][4] = {{ 1, 0, 0, 0},
+    double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
-                             { 1, 0, 0, 1}};
+                             {-1, 0, 0, 1}};
 
     int numTargets = targets.size();
 
@@ -67,7 +67,7 @@ void moveShapesRight(vector<struct shape *> targets)
 
 void moveShapesUp(vector<struct shape *> targets)
 {
-    double operation[4][4] = {{ 1, 0, 0, 0},
+    double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 1, 0, 1}};
@@ -87,7 +87,7 @@ void moveShapesUp(vector<struct shape *> targets)
 
 void moveShapesDown(vector<struct shape *> targets)
 {
-    double operation[4][4] = {{ 1, 0, 0, 0},
+    double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0,-1, 0, 1}};
@@ -107,7 +107,7 @@ void moveShapesDown(vector<struct shape *> targets)
 
 void moveShapesIn(vector<struct shape *> targets)
 {
-    double operation[4][4] = {{ 1, 0, 0, 0},
+    double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 0, 1, 1}};
@@ -127,7 +127,7 @@ void moveShapesIn(vector<struct shape *> targets)
 
 void moveShapesOut(vector<struct shape *> targets)
 {
-    double operation[4][4] = {{ 1, 0, 0, 0},
+    double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 0,-1, 1}};
@@ -162,13 +162,20 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
 
     if (axisOfRotation.z)
     {
-        double rotMat[4][4] = {{cos(thetaRads), sin(thetaRads), 0, 0}, 
-                            {-sin(thetaRads), cos(thetaRads), 0, 0},
-                            {0, 0, 1, 0},
-                            {0, 0, 0, 1}};
+        double rotMat[4][4] = { {cos(thetaRads), sin(thetaRads), 0, 0}, 
+                                {-sin(thetaRads), cos(thetaRads), 0, 0},
+                                {0, 0, 1, 0},
+                                {0, 0, 0, 1}};
         
-        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
-        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+        double trans1[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {-center.x, -center.y, -center.z, 1}};
+
+        double trans3[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {center.x, center.y, center.z, 1}};
 
 
         // TODO make num vertices not matter.
@@ -182,12 +189,20 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
     }
     else if (axisOfRotation.x)
     {
-        double rotMat[4][4] = {{1, 0, 0, 0}, 
-                            {0, cos(thetaRads), sin(thetaRads), 0},
-                            {0, -sin(thetaRads), cos(thetaRads), 0},
-                            {0, 0, 0, 1}};
-        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
-        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+        double rotMat[4][4] = { {1, 0, 0, 0}, 
+                                {0, cos(thetaRads), sin(thetaRads), 0},
+                                {0, -sin(thetaRads), cos(thetaRads), 0},
+                                {0, 0, 0, 1}};
+
+        double trans1[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {-center.x, -center.y, -center.z, 1}};
+
+        double trans3[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {center.x, center.y, center.z, 1}};
 
 
         // TODO make num vertices not matter.
@@ -201,12 +216,20 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
     }
     else if (axisOfRotation.y)
     {
-        double rotMat[4][4] = {{cos(thetaRads), 0, -sin(thetaRads), 0}, 
-                            {0, 1, 0, 0},
-                            {sin(thetaRads), 0, cos(thetaRads), 0},
-                            {0, 0, 0, 1}};
-        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
-        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+        double rotMat[4][4] = { {cos(thetaRads), 0, -sin(thetaRads), 0}, 
+                                {0, 1, 0, 0},
+                                {sin(thetaRads), 0, cos(thetaRads), 0},
+                                {0, 0, 0, 1}};
+
+        double trans1[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {-center.x, -center.y, -center.z, 1}};
+
+        double trans3[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {center.x, center.y, center.z, 1}};
 
 
         // TODO make num vertices not matter.
@@ -233,13 +256,20 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
 
     if (axisOfRotation.z)
     {
-        double rotMat[4][4] = {{cos(thetaRads), sin(thetaRads), 0, 0}, 
-                            {-sin(thetaRads), cos(thetaRads), 0, 0},
-                            {0, 0, 1, 0},
-                            {0, 0, 0, 1}};
+        double rotMat[4][4] = { {cos(thetaRads), sin(thetaRads), 0, 0}, 
+                                {-sin(thetaRads), cos(thetaRads), 0, 0},
+                                {0, 0, 1, 0},
+                                {0, 0, 0, 1}};
         
-        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
-        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+        double trans1[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {-center.x, -center.y, -center.z, 1}};
+
+        double trans3[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {center.x, center.y, center.z, 1}};
 
 
         // TODO make num vertices not matter.
@@ -253,12 +283,20 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
     }
     else if (axisOfRotation.x)
     {
-        double rotMat[4][4] = {{1, 0, 0, 0}, 
-                            {0, cos(thetaRads), sin(thetaRads), 0},
-                            {0, -sin(thetaRads), cos(thetaRads), 0},
-                            {0, 0, 0, 1}};
-        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
-        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+        double rotMat[4][4] = { {1, 0, 0, 0}, 
+                                {0, cos(thetaRads), sin(thetaRads), 0},
+                                {0, -sin(thetaRads), cos(thetaRads), 0},
+                                {0, 0, 0, 1}};
+
+        double trans1[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {-center.x, -center.y, -center.z, 1}};
+
+        double trans3[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {center.x, center.y, center.z, 1}};
 
 
         // TODO make num vertices not matter.
@@ -272,12 +310,20 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
     }
     else if (axisOfRotation.y)
     {
-        double rotMat[4][4] = {{cos(thetaRads), 0, -sin(thetaRads), 0}, 
-                            {0, 1, 0, 0},
-                            {sin(thetaRads), 0, cos(thetaRads), 0},
-                            {0, 0, 0, 1}};
-        double trans1[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {-center.x, -center.y, -center.z, 1}};
-        double trans3[4][4] = {{1, 0, 0, 0}, {0, 1, 0, 0}, {0, 0, 1, 0}, {center.x, center.y, center.z, 1}};
+        double rotMat[4][4] = { {cos(thetaRads), 0, -sin(thetaRads), 0}, 
+                                {0, 1, 0, 0},
+                                {sin(thetaRads), 0, cos(thetaRads), 0},
+                                {0, 0, 0, 1}};
+
+        double trans1[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {-center.x, -center.y, -center.z, 1}};
+
+        double trans3[4][4] = { {1, 0, 0, 0},
+                                {0, 1, 0, 0},
+                                {0, 0, 1, 0},
+                                {center.x, center.y, center.z, 1}};
 
 
         // TODO make num vertices not matter.
@@ -293,4 +339,36 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
     {
         return;
     }
+}
+
+
+void pivotCameraPitch(vector<struct shape *> targets, double angle)
+{
+    double rotMat[4][4] = { {1, 0, 0, 0}, 
+                            {0, cos(angle), sin(angle), 0},
+                            {0, -sin(angle), cos(angle), 0},
+                            {0, 0, 0, 1}};
+
+    int numTargets = targets.size();
+    for (int i = 0; i < numTargets; i++)
+    {
+        matMatMult(rotMat, targets[i]->vectors, targets[i]->vectors, targets[i]->numVertices);
+    }
+    
+}
+
+
+void pivotCameraYaw(vector<struct shape *> targets, double angle)
+{
+    double rotMat[4][4] = { {cos(angle), 0, -sin(angle), 0}, 
+                            {0, 1, 0, 0},
+                            {sin(angle), 0, cos(angle), 0},
+                            {0, 0, 0, 1}};
+
+    int numTargets = targets.size();
+    for (int i = 0; i < numTargets; i++)
+    {
+        matMatMult(rotMat, targets[i]->vectors, targets[i]->vectors, targets[i]->numVertices);
+    }
+    
 }
