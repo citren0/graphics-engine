@@ -14,10 +14,8 @@
 #include "./include/window.hpp"
 
 
-#define MAXSHAPES 10
-
+// 33 fps lock.
 #define FRAMETIME 30000
-
 
 
 int main(void)
@@ -25,87 +23,20 @@ int main(void)
 
     XEvent event;
     int * framebuf;
-
     X11Window window;
 
     window.init_x();
 
     framebuf = window.getFrameBuffer();
 
-
     std::vector<struct shape *> shapes;
-
-    // struct location center = {2.5, 2.5, 17.5};
-    // struct axis a1 = {0, 1, 0};
-
-
-    // struct shape square1;
-    // initShape(&square1);
-
-    // struct shape square2;
-    // initShape(&square2);
-
-    // struct shape square3;
-    // initShape(&square3);
-
-    // struct shape square4;
-    // initShape(&square4);
-
-
-    // addVertexToShape(&square1, (struct location){0, 0, 20});
-    // addVertexToShape(&square1, (struct location){5, 0, 20});
-    // addVertexToShape(&square1, (struct location){0, 5, 20});
-    // addVertexToShape(&square1, (struct location){5, 5, 20});
-
-    // addConnectionToShape(&square1, 0, 1);
-    // addConnectionToShape(&square1, 1, 3);
-    // addConnectionToShape(&square1, 2, 0);
-    // addConnectionToShape(&square1, 3, 2);
-
-
-    // addVertexToShape(&square2, (struct location){0, 0, 15});
-    // addVertexToShape(&square2, (struct location){5, 0, 15});
-    // addVertexToShape(&square2, (struct location){0, 5, 15});
-    // addVertexToShape(&square2, (struct location){5, 5, 15});
-
-    // addConnectionToShape(&square2, 0, 1);
-    // addConnectionToShape(&square2, 1, 3);
-    // addConnectionToShape(&square2, 2, 0);
-    // addConnectionToShape(&square2, 3, 2);
-
-
-    // addVertexToShape(&square3, (struct location){0, 0, 15});
-    // addVertexToShape(&square3, (struct location){5, 0, 20});
-    // addVertexToShape(&square3, (struct location){0, 5, 20});
-    // addVertexToShape(&square3, (struct location){5, 5, 15});
-
-    // addConnectionToShape(&square3, 0, 1);
-    // addConnectionToShape(&square3, 1, 3);
-    // addConnectionToShape(&square3, 2, 0);
-    // addConnectionToShape(&square3, 3, 2);
-
-
-    // addVertexToShape(&square4, (struct location){0, 0, 20});
-    // addVertexToShape(&square4, (struct location){5, 0, 15});
-    // addVertexToShape(&square4, (struct location){0, 5, 15});
-    // addVertexToShape(&square4, (struct location){5, 5, 20});
-
-    // addConnectionToShape(&square4, 0, 1);
-    // addConnectionToShape(&square4, 1, 3);
-    // addConnectionToShape(&square4, 2, 0);
-    // addConnectionToShape(&square4, 3, 2);
-
-    // shapes.push_back(&square1);
-    // shapes.push_back(&square2);
-    // shapes.push_back(&square3);
-    // shapes.push_back(&square4);
 
 
     struct shape * square;
-
-    for (int i = 0; i < 100; i++)
+    int gridSize = 1000;
+    for (int i = 0; i < gridSize; i++)
     {
-        for (int f = 0; f < 100; f++)
+        for (int f = 0; f < gridSize; f++)
         {
             square = (struct shape *)malloc(sizeof(struct shape));
 
@@ -129,10 +60,6 @@ int main(void)
             shapes.push_back(square);
         }
     }
-
-        moveShapesDown(shapes);
-        moveShapesDown(shapes);
-        moveShapesDown(shapes);
 
 
     for (;;)
@@ -208,17 +135,14 @@ int main(void)
 
         printf("\n");
 
-
         displayVertices(shapes, framebuf);
 
         window.putImage();
 
 
         auto stop = std::chrono::high_resolution_clock::now();
-
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-
-        std::cout << "Math took " << duration.count()/1000 << " ms" << std::endl;
+        std::cout << "Frame took " << duration.count()/1000 << " ms of processing." << std::endl;
 
         usleep(duration.count() < FRAMETIME ? FRAMETIME-duration.count() : 0);
 

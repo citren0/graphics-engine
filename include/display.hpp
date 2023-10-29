@@ -1,4 +1,5 @@
 #pragma once
+#include <cmath>
 #include "utils.hpp"
 #include <vector>
 
@@ -18,8 +19,8 @@
 
 #define dist(x1,y1,x2,y2) sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))
 
-#define scaleX(x) (int)((x * (SCREENWIDTH / 2)) + (SCREENWIDTH / 2))
-#define scaleY(y) (int)((y * (SCREENHEIGHT / 2)) + (SCREENHEIGHT / 2))
+#define scaleX(x) (int)(((double)(x + 1) / 2) * (SCREENWIDTH))
+#define scaleY(y) (int)(((double)(y + 1) / 2) * (SCREENHEIGHT))
 
 #define xInBounds(x) ((x < 0.95) && (x > -0.95))
 #define yInBounds(y) ((y < 0.95) && (y > -0.95))

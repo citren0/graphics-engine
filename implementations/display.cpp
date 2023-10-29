@@ -2,6 +2,7 @@
 #include <iostream>
 #include <string>
 #include <cmath>
+#include <chrono>
 
 #include "../include/display.hpp"
 #include "../include/transforms.hpp"
@@ -11,7 +12,6 @@ double projMat[4][4] = {{S, 0, 0, 0},
                         {0, S, 0, 0},
                         {0, 0, -(far+near)/(far-near), -1},
                         {0, 0, (-2.0 * far * near)/(far-near), 0}};
-
 
 
 void initBuffer(char buf[SCREENHEIGHT][SCREENWIDTH])
@@ -34,87 +34,100 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 
     initBuffer(pixels);
 
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> stop;
+    int totalConnections = 0;
+
     // Must calculate pixel location of each vertex and the connections between.
     for (int index = 0; index < numShapes; index++)
     {
         // TODO - make number of vertices not matter.
         
-
         struct shape * currShape = shapes[index];
-
 
         int n = currShape->numVertices;
 
         double homogCurr[n][NUMBER_OF_HOMOGENEOUS_COORDS];
 
+        bool isBehind = false;
+
+        for (int i = 0; i < n; i++)
+        {
+            if (currShape->vectors[i][2] < 0)
+            {
+                isBehind = true;
+                break;
+            }
+        }
+
+        if (isBehind)
+        {
+            continue;
+        }
 
         matMatMult(projMat, currShape->vectors, homogCurr, n);
+
         scaleHomogenous(homogCurr, n);
 
         // Draw vertices of the shapes.
         for (int i = 0; i < n; i++)
         {
-            double unscaledX = homogCurr[i][0];
-            double unscaledY = homogCurr[i][1];
+
+            // Unscaled coordinates are on the interval [-1,1]
+            int x = scaleX(homogCurr[i][0]);
+            int y = scaleY(homogCurr[i][1]);
 
             // Leave a small margin on each side of the display.
-            if (!xInBounds(unscaledX) || !yInBounds(unscaledY))
+            if (x > 0 && x < SCREENWIDTH && y > 0 && y < SCREENHEIGHT)
             {
-                continue;
+                pixels[y][x] = 1;
             }
-            
-            // Unscaled coordinates are on the interval [-1,1]
-            int x = scaleX(unscaledX);
-            int y = scaleY(unscaledY);
 
-            pixels[y][x] = 1;
         }
 
-        // Draw connection lines from vertex 'from' to vertex 'to'
+
         for (int from = 0; from < n; from++)
         {
             for (int to = 0; to < n; to++)
             {
                 if (currShape->connectivity[from][to] == 1)
                 {
-                    // points 'from' and 'to' are connected.
+                    int fromx = scaleX(homogCurr[from][0]);
+                    int fromy = scaleY(homogCurr[from][1]);
 
-                    double pixelDistance = dist(homogCurr[from][0]*(SCREENWIDTH), homogCurr[from][1]*(SCREENHEIGHT), homogCurr[to][0]*(SCREENWIDTH), homogCurr[to][1]*SCREENHEIGHT);
+                    int tox = scaleX(homogCurr[to][0]);
+                    int toy = scaleY(homogCurr[to][1]);
 
-                    double deltaX = homogCurr[to][0] - homogCurr[from][0];
-                    double deltaY = homogCurr[to][1] - homogCurr[from][1];
-                    
-                    double unscaledX = homogCurr[from][0];
-                    double unscaledY = homogCurr[from][1];
+                    int dist = dist(fromx, fromy, tox, toy);
 
-                    if (!xInBounds(homogCurr[to][0]) && !xInBounds(homogCurr[from][0]) && !yInBounds(homogCurr[to][1]) && !yInBounds(homogCurr[from][1]))
+                    // Investigate.
+                    if (dist > dist(0, 0, SCREENWIDTH, SCREENHEIGHT))
                     {
                         continue;
                     }
 
-                    for (int march = 0; march < pixelDistance; march++)
+                    double xIncrement = (dist != 0) ? (double)(tox - fromx) / dist : 0.0;
+                    double yIncrement = (dist != 0) ? (double)(toy - fromy) / dist : 0.0;
+
+                    double currx = fromx;
+                    double curry = fromy;
+
+                    // Problematic.
+                    for (int march = 0; march < dist; march++)
                     {
-                        unscaledX += (deltaX / pixelDistance);
-
-                        unscaledY += (deltaY / pixelDistance);
-
-                        if (!xInBounds(unscaledX) || !yInBounds(unscaledY))
+                        //printf("dist %d\n currx %f\n curry %f\n\n", dist, currx, curry);
+                        if (currx > 0 && currx < SCREENWIDTH && curry > 0 && curry < SCREENHEIGHT)
                         {
-                            continue;
+                            if (pixels[(int)curry][(int)currx] != 1)
+                            {
+                                pixels[(int)curry][(int)currx] = 2;
+                            }
                         }
 
-
-                        int x = scaleX(unscaledX);
-                        int y = scaleY(unscaledY);
-
-                        if (pixels[y][x] != 1)
-                        {
-                            pixels[y][x] = 2;
-                        }
-                        
+                        currx += xIncrement;
+                        curry += yIncrement;
                     }
-                    
-                    
+
                 }
             }
         }
@@ -130,17 +143,24 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 
             if (pixels[row][col] == 1)
             {
+                // White
                 framebuf[arrayPosition] = 0xFFFFFFFF;
             }
             else if (pixels[row][col] == 2)
             {
+                // Blue
                 framebuf[arrayPosition] = 0xFF0000FF;
             }
             else
             {
+                // Black
                 framebuf[arrayPosition] = 0x00000000;
             }
         }
     }
+
+
+    std::cout << "Connecting took " << totalConnections << " us" << std::endl;
+    std::cout << std::endl << std::endl << std::endl;
 
 }
