@@ -33,6 +33,7 @@ int addVertexToShape(struct shape * target, struct location point)
     }
 
     int numVertices = target->numVertices;
+
     target->vectors[numVertices][0] = point.x;
     target->vectors[numVertices][1] = point.y;
     target->vectors[numVertices][2] = point.z;
@@ -53,9 +54,9 @@ int addConnectionToShape(struct shape * target, int source, int destination)
 
 void copyMatrix(double source[][NUMBER_OF_HOMOGENEOUS_COORDS], double dest[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
 {
-    for (int i = 0; i < NUMBER_OF_HOMOGENEOUS_COORDS; i++)
+    for (int i = 0; i < n; i++)
     {
-        for (int f = 0; f < n; f++)
+        for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
         {
             dest[i][f] = source[i][f];
         }
@@ -89,14 +90,12 @@ void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGEN
 
 void printMat(double mat[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
 {
-    for (int i = 0; i < NUMBER_OF_HOMOGENEOUS_COORDS; i++)
+    for (int i = 0; i < n; i++)
     {
-        printf("| ");
-        for (int f = 0; f < n; f++)
+        printf("\n");
+        for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
         {
-            printf("%f ", mat[f][i]);
+            printf("%f ", mat[i][f]);
         }
-        printf("|\n");
     }
-    printf("\n");
 }

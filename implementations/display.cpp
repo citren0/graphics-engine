@@ -62,7 +62,7 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
 
         if (isBehind)
         {
-            continue;
+            //continue;
         }
 
         matMatMult(projMat, currShape->vectors, homogCurr, n);

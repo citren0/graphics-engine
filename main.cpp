@@ -6,6 +6,9 @@
 #include <vector>
 #include <chrono>
 
+#include <fstream>
+#include <sstream>
+
 #include <X11/Xutil.h>
 
 #include "./include/display.hpp"
@@ -32,34 +35,65 @@ int main(void)
     std::vector<struct shape *> shapes;
 
 
+    // struct shape * square;
+    // int gridSize = 100;
+    // for (int i = 0; i < gridSize; i++)
+    // {
+    //     for (int f = 0; f < gridSize; f++)
+    //     {
+    //         square = (struct shape *)malloc(sizeof(struct shape));
+
+    //         if (square == NULL)
+    //         {
+    //             printf("Malloc failed.\n");
+    //             exit(1);
+    //         }
+
+    //         initShape(square);
+    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
+    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
+    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
+    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
+
+    //         addConnectionToShape(square, 0, 2);
+    //         addConnectionToShape(square, 2, 1);
+    //         addConnectionToShape(square, 1, 3);
+    //         addConnectionToShape(square, 3, 0);
+
+    //         shapes.push_back(square);
+    //     }
+    // }
+
     struct shape * square;
-    int gridSize = 1000;
-    for (int i = 0; i < gridSize; i++)
+    std::fstream f("object.obj" , std::ios::in);
+    std::string str;
+    square = (struct shape *)malloc(sizeof(struct shape));
+
+    if (square == NULL)
     {
-        for (int f = 0; f < gridSize; f++)
+        exit(1);
+    }
+
+    while (getline(f, str))
+    {
+        if (str[0] == 'v')
         {
-            square = (struct shape *)malloc(sizeof(struct shape));
+            
+            std::stringstream strstream;
+            strstream << str;
+            char v;
+            double a, b, c;
+            strstream >> v >> a >> b >> c;
 
-            if (square == NULL)
-            {
-                printf("Malloc failed.\n");
-                exit(1);
-            }
+            std::cout << str << "       a " << a << " b " << b << " c " << c << std::endl;
 
-            initShape(square);
-            addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
-            addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
-            addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
-            addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
-
-            addConnectionToShape(square, 0, 2);
-            addConnectionToShape(square, 2, 1);
-            addConnectionToShape(square, 1, 3);
-            addConnectionToShape(square, 3, 0);
-
-            shapes.push_back(square);
+            addVertexToShape(square, (struct location){a, b, c});        
         }
     }
+    shapes.push_back(square);
+
+    printMat(square->vectors, square->numVertices);
+
 
 
     for (;;)
@@ -136,6 +170,8 @@ int main(void)
         printf("\n");
 
         displayVertices(shapes, framebuf);
+
+        printMat(square->vectors, square->numVertices);
 
         window.putImage();
 

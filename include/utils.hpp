@@ -4,7 +4,7 @@
 
 #define PI 3.14159265
 
-#define MAX_VERTICES_PER_SHAPE 4
+#define MAX_VERTICES_PER_SHAPE 10000
 #define NUMBER_OF_HOMOGENEOUS_COORDS 4
 #define MAX_CONNECTIONS_PER_VERTEX 4
 
@@ -38,9 +38,9 @@ int addConnectionToShape(struct shape * target, int source, int destination);
 
 int addVertexToShape(struct shape * target, struct location point);
 
-void copyMatrix(double source[][4], double dest[][4], int n);
+void copyMatrix(double source[][NUMBER_OF_HOMOGENEOUS_COORDS], double dest[][NUMBER_OF_HOMOGENEOUS_COORDS], int n);
 
-void matMatMult(double operation[4][4], double target[][4], double destination[][4], int n);
+void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS], double target[][NUMBER_OF_HOMOGENEOUS_COORDS], double destination[][NUMBER_OF_HOMOGENEOUS_COORDS], int n);
 
 void printMat(double mat[][4], int n);
 

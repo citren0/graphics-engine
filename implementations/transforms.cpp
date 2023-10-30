@@ -34,7 +34,7 @@ void moveShapesLeft(vector<struct shape *> targets)
 
     int numTargets = targets.size();
     
-    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
 
     for (int i = 0; i < numTargets; i++)
     {
@@ -54,7 +54,7 @@ void moveShapesRight(vector<struct shape *> targets)
 
     int numTargets = targets.size();
 
-    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
 
     for (int i = 0; i < numTargets; i++)
     {
@@ -74,7 +74,7 @@ void moveShapesUp(vector<struct shape *> targets)
 
     int numTargets = targets.size();
 
-    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
 
     for (int i = 0; i < numTargets; i++)
     {
@@ -94,7 +94,7 @@ void moveShapesDown(vector<struct shape *> targets)
 
     int numTargets = targets.size();
 
-    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
 
     for (int i = 0; i < numTargets; i++)
     {
@@ -114,7 +114,7 @@ void moveShapesIn(vector<struct shape *> targets)
 
     int numTargets = targets.size();
 
-    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
 
     for (int i = 0; i < numTargets; i++)
     {
@@ -135,7 +135,7 @@ void moveShapesOut(vector<struct shape *> targets)
 
     int numTargets = targets.size();
 
-    double buf[NUMBER_OF_HOMOGENEOUS_COORDS][MAX_VERTICES_PER_SHAPE];
+    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
     
     for (int i = 0; i < numTargets; i++)
     {
@@ -179,7 +179,7 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
 
 
         // TODO make num vertices not matter.
-        double buf[4][4];
+        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
         // Transform 1
         matMatMult(trans1, target->vectors, buf, target->numVertices);
         // Transform 2
@@ -206,7 +206,7 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
 
 
         // TODO make num vertices not matter.
-        double buf[4][4];
+        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
         // Transform 1
         matMatMult(trans1, target->vectors, buf, target->numVertices);
         // Transform 2
@@ -233,7 +233,7 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
 
 
         // TODO make num vertices not matter.
-        double buf[4][4];
+        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
         // Transform 1
         matMatMult(trans1, target->vectors, buf, target->numVertices);
         // Transform 2
@@ -273,7 +273,7 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
 
 
         // TODO make num vertices not matter.
-        double buf[4][4];
+        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
         // Transform 1
         matMatMult(trans1, target->vectors, buf, target->numVertices);
         // Transform 2
@@ -300,7 +300,7 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
 
 
         // TODO make num vertices not matter.
-        double buf[4][4];
+        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
         // Transform 1
         matMatMult(trans1, target->vectors, buf, target->numVertices);
         // Transform 2
@@ -327,7 +327,7 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
 
 
         // TODO make num vertices not matter.
-        double buf[4][4];
+        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
         // Transform 1
         matMatMult(trans1, target->vectors, buf, target->numVertices);
         // Transform 2
