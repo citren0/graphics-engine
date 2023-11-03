@@ -20,6 +20,9 @@
 // 33 fps lock.
 #define FRAMETIME 30000
 
+struct location center = {0, 0, 0};
+struct axis a1 = {0, 1, 0};
+
 
 int main(void)
 {
@@ -34,65 +37,66 @@ int main(void)
 
     std::vector<struct shape *> shapes;
 
-
-    // struct shape * square;
-    // int gridSize = 100;
-    // for (int i = 0; i < gridSize; i++)
-    // {
-    //     for (int f = 0; f < gridSize; f++)
-    //     {
-    //         square = (struct shape *)malloc(sizeof(struct shape));
-
-    //         if (square == NULL)
-    //         {
-    //             printf("Malloc failed.\n");
-    //             exit(1);
-    //         }
-
-    //         initShape(square);
-    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
-    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
-    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
-    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
-
-    //         addConnectionToShape(square, 0, 2);
-    //         addConnectionToShape(square, 2, 1);
-    //         addConnectionToShape(square, 1, 3);
-    //         addConnectionToShape(square, 3, 0);
-
-    //         shapes.push_back(square);
-    //     }
-    // }
+    double * vertices = initVertices();
 
     struct shape * square;
-    std::fstream f("object.obj" , std::ios::in);
-    std::string str;
-    square = (struct shape *)malloc(sizeof(struct shape));
-
-    if (square == NULL)
+    int gridSize = 1000;
+    for (int i = 0; i < gridSize; i++)
     {
-        exit(1);
-    }
-
-    while (getline(f, str))
-    {
-        if (str[0] == 'v')
+        for (int f = 0; f < gridSize; f++)
         {
-            
-            std::stringstream strstream;
-            strstream << str;
-            char v;
-            double a, b, c;
-            strstream >> v >> a >> b >> c;
+            square = (struct shape *)malloc(sizeof(struct shape));
 
-            std::cout << str << "       a " << a << " b " << b << " c " << c << std::endl;
+            if (square == NULL)
+            {
+                printf("Malloc failed.\n");
+                exit(1);
+            }
 
-            addVertexToShape(square, (struct location){a, b, c});        
+            initShape(square, vertices, shapes.size());
+            addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
+            addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
+            addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
+            addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
+
+            addConnectionToShape(square, 0, 2);
+            addConnectionToShape(square, 2, 1);
+            addConnectionToShape(square, 1, 3);
+            addConnectionToShape(square, 3, 0);
+
+            shapes.push_back(square);
         }
     }
-    shapes.push_back(square);
 
-    printMat(square->vectors, square->numVertices);
+    // struct shape * square;
+    // std::fstream f("object.obj" , std::ios::in);
+    // std::string str;
+    // square = (struct shape *)malloc(sizeof(struct shape));
+
+    // if (square == NULL)
+    // {
+    //     exit(1);
+    // }
+
+    // while (getline(f, str))
+    // {
+    //     if (str[0] == 'v')
+    //     {
+            
+    //         std::stringstream strstream;
+    //         strstream << str;
+    //         char v;
+    //         double a, b, c;
+    //         strstream >> v >> a >> b >> c;
+
+    //         std::cout << str << "       a " << a << " b " << b << " c " << c << std::endl;
+
+    //         addVertexToShape(square, (struct location){a, b, c});        
+    //     }
+    // }
+    // shapes.push_back(square);
+
+    // printMat(square->vectors, square->numVertices);
 
 
 
@@ -111,53 +115,47 @@ int main(void)
         {
             case KeyPress:
 
-                start = std::chrono::high_resolution_clock::now();
+                
 
                 ks = XLookupKeysym(&(event.xkey), 0);
 
                 switch (ks)
                 {
                     case XK_a:                        
-                        moveShapesLeft(shapes);
+                        moveShapesLeft(vertices);
                         break;
                     case XK_d:
-                        moveShapesRight(shapes);
+                        moveShapesRight(vertices);
                         break;
                     case XK_w:
-                        moveShapesUp(shapes);
+                        moveShapesUp(vertices);
                         break;
                     case XK_s:
-                        moveShapesDown(shapes);
+                        moveShapesDown(vertices);
                         break;
                     case XK_r:
-                        moveShapesOut(shapes);
+                        moveShapesOut(vertices);
                         break;
                     case XK_f:
-                        moveShapesIn(shapes);
+                        moveShapesIn(vertices);
                         break;
                     case XK_q:
-                        // rotateShapesCW(&square1, center, a1);
-                        // rotateShapesCW(&square2, center, a1);
-                        // rotateShapesCW(&square3, center, a1);
-                        // rotateShapesCW(&square4, center, a1);
+                        rotateShapesCW(vertices, center, a1);
                         break;
                     case XK_e:
-                        // rotateShapesCCW(&square1, center, a1);
-                        // rotateShapesCCW(&square2, center, a1);
-                        // rotateShapesCCW(&square3, center, a1);
-                        // rotateShapesCCW(&square4, center, a1);
+                        rotateShapesCCW(vertices, center, a1);
                         break;
                     case XK_i:
-                        pivotCameraPitch(shapes, PI/64);
+                        pivotCameraPitch(vertices, PI/64);
                         break;
                     case XK_k:
-                        pivotCameraPitch(shapes, -PI/64);
+                        pivotCameraPitch(vertices, -PI/64);
                         break;
                     case XK_j:
-                        pivotCameraYaw(shapes, PI/64);
+                        pivotCameraYaw(vertices, PI/64);
                         break;
                     case XK_l:
-                        pivotCameraYaw(shapes, -PI/64);
+                        pivotCameraYaw(vertices, -PI/64);
                         break;
                     default:
                         break;
@@ -169,16 +167,18 @@ int main(void)
 
         printf("\n");
 
-        displayVertices(shapes, framebuf);
+        
+        start = std::chrono::high_resolution_clock::now();
 
-        printMat(square->vectors, square->numVertices);
-
-        window.putImage();
-
+        displayVertices(shapes, vertices, framebuf);
 
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << "Frame took " << duration.count()/1000 << " ms of processing." << std::endl;
+        std::cout << "display and putimage took " << duration.count()/1000 << " ms of processing." << std::endl;
+        
+
+        window.putImage();
+
 
         usleep(duration.count() < FRAMETIME ? FRAMETIME-duration.count() : 0);
 

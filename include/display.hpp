@@ -3,8 +3,8 @@
 #include "utils.hpp"
 #include <vector>
 
-#define SCREENWIDTH 2000
-#define SCREENHEIGHT 1200
+#define SCREENWIDTH 3000
+#define SCREENHEIGHT 2000
 #define MAXCONNECTIONS 4
 
 // Field of View in degrees
@@ -25,7 +25,6 @@
 #define xInBounds(x) ((x < 0.95) && (x > -0.95))
 #define yInBounds(y) ((y < 0.95) && (y > -0.95))
 
-
 void initBuf(char buf[SCREENHEIGHT][SCREENWIDTH]);
 
-void displayVertices(std::vector<struct shape *> shapes, int * framebuf);
+void displayVertices(std::vector<struct shape *> shapes, double * vertices, int * framebuf);

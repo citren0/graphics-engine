@@ -1,6 +1,6 @@
 
 CC=g++
-CFLAGS= -g -Og -Wall -Werror -Wextra
+CFLAGS= -Ofast -g -Wall -Werror -Wextra -fopenmp
 
 LIBS=-lm -lX11 -lXext
 

@@ -6,24 +6,26 @@ using namespace std;
 
 void scaleHomogenous(double source[][4], int n);
 
-void moveShapesLeft(vector<struct shape *> targets);
+void scaleHomogenous1D(double * source, int n);
 
-void moveShapesRight(vector<struct shape *> targets);
+void moveShapesLeft(double * targets);
 
-void moveShapesUp(vector<struct shape *> targets);
+void moveShapesRight(double * targets);
 
-void moveShapesDown(vector<struct shape *> targets);
+void moveShapesUp(double * targets);
 
-void moveShapesIn(vector<struct shape *> targets);
+void moveShapesDown(double * targets);
 
-void moveShapesOut(vector<struct shape *> targets);
+void moveShapesIn(double * targets);
+
+void moveShapesOut(double * targets);
 
 void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3]);
 
-void rotateShapesCCW(struct shape * target, struct location center, struct axis axisOfRotation);
+void rotateShapesCCW(double * targets, struct location center, struct axis axisOfRotation);
 
-void rotateShapesCW(struct shape * target, struct location center, struct axis axisOfRotation);
+void rotateShapesCW(double * targets, struct location center, struct axis axisOfRotation);
 
-void pivotCameraPitch(vector<struct shape *> targets, double angle);
+void pivotCameraPitch(double * targets, double angle);
 
-void pivotCameraYaw(vector<struct shape *> targets, double angle);
+void pivotCameraYaw(double * targets, double angle);

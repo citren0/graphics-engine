@@ -22,9 +22,20 @@ void scaleHomogenous(double source[][4], int n)
 }
 
 
-// TODO change so matrix is put in right place
+void scaleHomogenous1D(double * source, int n)
+{
+    for (int i = 0; i < n; i++)
+    {
+        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
+        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 1] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 1] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
+        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 2] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 2] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
+        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
+    }
+}
+
+
 // make the factor of movement changeable.
-void moveShapesLeft(vector<struct shape *> targets)
+void moveShapesLeft(double * targets)
 {
     // Matrices are stored with the vertical vectors contiguous in memory.
     double operation[4][4] = {{1, 0, 0, 0},
@@ -32,100 +43,56 @@ void moveShapesLeft(vector<struct shape *> targets)
                              { 0, 0, 1, 0},
                              { 1, 0, 0, 1}};
 
-    int numTargets = targets.size();
-    
-    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-
-    for (int i = 0; i < numTargets; i++)
-    {
-        // TODO - make num vertices not matter.
-        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
-        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
-    }
+    applyTransform(targets, operation);
 }
 
 
-void moveShapesRight(vector<struct shape *> targets)
+void moveShapesRight(double * targets)
 {
     double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              {-1, 0, 0, 1}};
 
-    int numTargets = targets.size();
-
-    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-
-    for (int i = 0; i < numTargets; i++)
-    {
-        // TODO make num vertices not matter.
-        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
-        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
-    }
+    applyTransform(targets, operation);
 }
 
 
-void moveShapesUp(vector<struct shape *> targets)
+void moveShapesUp(double * targets)
 {
     double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 1, 0, 1}};
 
-    int numTargets = targets.size();
+    applyTransform(targets, operation);
 
-    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-
-    for (int i = 0; i < numTargets; i++)
-    {
-        // TODO make num vertices not matter.
-        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
-        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
-    }
 }
 
 
-void moveShapesDown(vector<struct shape *> targets)
+void moveShapesDown(double * targets)
 {
     double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0,-1, 0, 1}};
 
-    int numTargets = targets.size();
-
-    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-
-    for (int i = 0; i < numTargets; i++)
-    {
-        // TODO make num vertices not matter.
-        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
-        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
-    }
+    applyTransform(targets, operation);
 }
 
 
-void moveShapesIn(vector<struct shape *> targets)
+void moveShapesIn(double * targets)
 {
     double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
                              { 0, 0, 1, 0},
                              { 0, 0, 1, 1}};
 
-    int numTargets = targets.size();
-
-    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-
-    for (int i = 0; i < numTargets; i++)
-    {
-        // TODO make num vertices not matter.
-        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
-        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
-    }
+    applyTransform(targets, operation);
 }
 
 
-void moveShapesOut(vector<struct shape *> targets)
+void moveShapesOut(double * targets)
 {
     double operation[4][4] = {{1, 0, 0, 0},
                              { 0, 1, 0, 0},
@@ -133,16 +100,7 @@ void moveShapesOut(vector<struct shape *> targets)
                              { 0, 0,-1, 1}};
 
 
-    int numTargets = targets.size();
-
-    double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-    
-    for (int i = 0; i < numTargets; i++)
-    {
-        // TODO make num vertices not matter.
-        matMatMult(operation, targets[i]->vectors, buf, targets[i]->numVertices);
-        copyMatrix(buf, targets[i]->vectors, targets[i]->numVertices);
-    }
+    applyTransform(targets, operation);
 }
 
 
@@ -156,9 +114,9 @@ void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3
 
 
 // Rotate the shape around (h,k)
-void rotateShapesCCW(struct shape * target, struct location center, struct axis axisOfRotation)
+void rotateShapesCCW(double * targets, struct location center, struct axis axisOfRotation)
 {
-    double thetaRads = PI/72.0;
+    double thetaRads = PI/64.0;
 
     if (axisOfRotation.z)
     {
@@ -172,20 +130,15 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
                                 {0, 0, 1, 0},
                                 {-center.x, -center.y, -center.z, 1}};
 
-        double trans3[4][4] = { {1, 0, 0, 0},
+        double trans2[4][4] = { {1, 0, 0, 0},
                                 {0, 1, 0, 0},
                                 {0, 0, 1, 0},
                                 {center.x, center.y, center.z, 1}};
 
 
-        // TODO make num vertices not matter.
-        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-        // Transform 1
-        matMatMult(trans1, target->vectors, buf, target->numVertices);
-        // Transform 2
-        matMatMult(rotMat, buf, buf, target->numVertices);
-        // Transform 3
-        matMatMult(trans3, buf, target->vectors, target->numVertices);
+        applyTransform(targets, trans1);
+        applyTransform(targets, rotMat);
+        applyTransform(targets, trans2);
     }
     else if (axisOfRotation.x)
     {
@@ -199,20 +152,15 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
                                 {0, 0, 1, 0},
                                 {-center.x, -center.y, -center.z, 1}};
 
-        double trans3[4][4] = { {1, 0, 0, 0},
+        double trans2[4][4] = { {1, 0, 0, 0},
                                 {0, 1, 0, 0},
                                 {0, 0, 1, 0},
                                 {center.x, center.y, center.z, 1}};
 
 
-        // TODO make num vertices not matter.
-        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-        // Transform 1
-        matMatMult(trans1, target->vectors, buf, target->numVertices);
-        // Transform 2
-        matMatMult(rotMat, buf, buf, target->numVertices);
-        // Transform 3
-        matMatMult(trans3, buf, target->vectors, target->numVertices);
+        applyTransform(targets, trans1);
+        applyTransform(targets, rotMat);
+        applyTransform(targets, trans2);
     }
     else if (axisOfRotation.y)
     {
@@ -226,20 +174,15 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
                                 {0, 0, 1, 0},
                                 {-center.x, -center.y, -center.z, 1}};
 
-        double trans3[4][4] = { {1, 0, 0, 0},
+        double trans2[4][4] = { {1, 0, 0, 0},
                                 {0, 1, 0, 0},
                                 {0, 0, 1, 0},
                                 {center.x, center.y, center.z, 1}};
 
 
-        // TODO make num vertices not matter.
-        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-        // Transform 1
-        matMatMult(trans1, target->vectors, buf, target->numVertices);
-        // Transform 2
-        matMatMult(rotMat, buf, buf, target->numVertices);
-        // Transform 3
-        matMatMult(trans3, buf, target->vectors, target->numVertices);
+        applyTransform(targets, trans1);
+        applyTransform(targets, rotMat);
+        applyTransform(targets, trans2);
     }
     else
     {
@@ -250,7 +193,7 @@ void rotateShapesCCW(struct shape * target, struct location center, struct axis 
 }
 
 
-void rotateShapesCW(struct shape * target, struct location center, struct axis axisOfRotation)
+void rotateShapesCW(double * targets, struct location center, struct axis axisOfRotation)
 {
     double thetaRads = -PI/72.0;
 
@@ -266,20 +209,15 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
                                 {0, 0, 1, 0},
                                 {-center.x, -center.y, -center.z, 1}};
 
-        double trans3[4][4] = { {1, 0, 0, 0},
+        double trans2[4][4] = { {1, 0, 0, 0},
                                 {0, 1, 0, 0},
                                 {0, 0, 1, 0},
                                 {center.x, center.y, center.z, 1}};
 
 
-        // TODO make num vertices not matter.
-        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-        // Transform 1
-        matMatMult(trans1, target->vectors, buf, target->numVertices);
-        // Transform 2
-        matMatMult(rotMat, buf, buf, target->numVertices);
-        // Transform 3
-        matMatMult(trans3, buf, target->vectors, target->numVertices);
+        applyTransform(targets, trans1);
+        applyTransform(targets, rotMat);
+        applyTransform(targets, trans2);
     }
     else if (axisOfRotation.x)
     {
@@ -293,20 +231,15 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
                                 {0, 0, 1, 0},
                                 {-center.x, -center.y, -center.z, 1}};
 
-        double trans3[4][4] = { {1, 0, 0, 0},
+        double trans2[4][4] = { {1, 0, 0, 0},
                                 {0, 1, 0, 0},
                                 {0, 0, 1, 0},
                                 {center.x, center.y, center.z, 1}};
 
 
-        // TODO make num vertices not matter.
-        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-        // Transform 1
-        matMatMult(trans1, target->vectors, buf, target->numVertices);
-        // Transform 2
-        matMatMult(rotMat, buf, buf, target->numVertices);
-        // Transform 3
-        matMatMult(trans3, buf, target->vectors, target->numVertices);
+        applyTransform(targets, trans1);
+        applyTransform(targets, rotMat);
+        applyTransform(targets, trans2);
     }
     else if (axisOfRotation.y)
     {
@@ -320,20 +253,15 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
                                 {0, 0, 1, 0},
                                 {-center.x, -center.y, -center.z, 1}};
 
-        double trans3[4][4] = { {1, 0, 0, 0},
+        double trans2[4][4] = { {1, 0, 0, 0},
                                 {0, 1, 0, 0},
                                 {0, 0, 1, 0},
                                 {center.x, center.y, center.z, 1}};
 
 
-        // TODO make num vertices not matter.
-        double buf[MAX_VERTICES_PER_SHAPE][NUMBER_OF_HOMOGENEOUS_COORDS];
-        // Transform 1
-        matMatMult(trans1, target->vectors, buf, target->numVertices);
-        // Transform 2
-        matMatMult(rotMat, buf, buf, target->numVertices);
-        // Transform 3
-        matMatMult(trans3, buf, target->vectors, target->numVertices);
+        applyTransform(targets, trans1);
+        applyTransform(targets, rotMat);
+        applyTransform(targets, trans2);
     }
     else
     {
@@ -342,33 +270,25 @@ void rotateShapesCW(struct shape * target, struct location center, struct axis a
 }
 
 
-void pivotCameraPitch(vector<struct shape *> targets, double angle)
+void pivotCameraPitch(double * targets, double angle)
 {
     double rotMat[4][4] = { {1, 0, 0, 0}, 
                             {0, cos(angle), sin(angle), 0},
                             {0, -sin(angle), cos(angle), 0},
                             {0, 0, 0, 1}};
 
-    int numTargets = targets.size();
-    for (int i = 0; i < numTargets; i++)
-    {
-        matMatMult(rotMat, targets[i]->vectors, targets[i]->vectors, targets[i]->numVertices);
-    }
+    applyTransform(targets, rotMat);
     
 }
 
 
-void pivotCameraYaw(vector<struct shape *> targets, double angle)
+void pivotCameraYaw(double * targets, double angle)
 {
     double rotMat[4][4] = { {cos(angle), 0, -sin(angle), 0}, 
                             {0, 1, 0, 0},
                             {sin(angle), 0, cos(angle), 0},
                             {0, 0, 0, 1}};
 
-    int numTargets = targets.size();
-    for (int i = 0; i < numTargets; i++)
-    {
-        matMatMult(rotMat, targets[i]->vectors, targets[i]->vectors, targets[i]->numVertices);
-    }
+    applyTransform(targets, rotMat);
     
 }

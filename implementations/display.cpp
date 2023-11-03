@@ -26,77 +26,60 @@ void initBuffer(char buf[SCREENHEIGHT][SCREENWIDTH])
 }
 
 
-void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
+void displayVertices(vector<struct shape *> shapes, double * vertices, int * framebuf)
 {
-    int numShapes = shapes.size();
+    std::chrono::time_point<std::chrono::high_resolution_clock> start;
+    std::chrono::time_point<std::chrono::high_resolution_clock> stop;
 
     char pixels[SCREENHEIGHT][SCREENWIDTH];
 
     initBuffer(pixels);
-
-    std::chrono::time_point<std::chrono::high_resolution_clock> start;
-    std::chrono::time_point<std::chrono::high_resolution_clock> stop;
-    int totalConnections = 0;
-
-    // Must calculate pixel location of each vertex and the connections between.
-    for (int index = 0; index < numShapes; index++)
-    {
-        // TODO - make number of vertices not matter.
+    
+    int maxVertices = MAX_SHAPES * MAX_VERTICES_PER_SHAPE;
         
-        struct shape * currShape = shapes[index];
+    double * homogCurr = initVertices();
 
-        int n = currShape->numVertices;
 
-        double homogCurr[n][NUMBER_OF_HOMOGENEOUS_COORDS];
+    matMatMult1D(projMat, vertices, homogCurr, maxVertices);
 
-        bool isBehind = false;
+    scaleHomogenous1D(homogCurr, maxVertices);
 
-        for (int i = 0; i < n; i++)
+    // Draw vertices of the shapes.
+    for (int i = 0; i < maxVertices; i++)
+    {
+
+        // Unscaled coordinates are on the interval [-1,1]
+        int x = scaleX(homogCurr[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
+        int y = scaleY(homogCurr[i * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
+
+        // Leave a small margin on each side of the display.
+        if (x > 0 && x < SCREENWIDTH && y > 0 && y < SCREENHEIGHT)
         {
-            if (currShape->vectors[i][2] < 0)
-            {
-                isBehind = true;
-                break;
-            }
+            pixels[y][x] = 1;
         }
 
-        if (isBehind)
+    }
+
+
+    int numShapes = shapes.size();
+    struct shape * currShape;
+
+    for (int shape = 0; shape < numShapes; shape++)
+    {
+        currShape = shapes[shape];
+        int numVertices = currShape->numVertices;
+
+        for (int from = 0; from < numVertices; from++)
         {
-            //continue;
-        }
-
-        matMatMult(projMat, currShape->vectors, homogCurr, n);
-
-        scaleHomogenous(homogCurr, n);
-
-        // Draw vertices of the shapes.
-        for (int i = 0; i < n; i++)
-        {
-
-            // Unscaled coordinates are on the interval [-1,1]
-            int x = scaleX(homogCurr[i][0]);
-            int y = scaleY(homogCurr[i][1]);
-
-            // Leave a small margin on each side of the display.
-            if (x > 0 && x < SCREENWIDTH && y > 0 && y < SCREENHEIGHT)
-            {
-                pixels[y][x] = 1;
-            }
-
-        }
-
-
-        for (int from = 0; from < n; from++)
-        {
-            for (int to = 0; to < n; to++)
+            for (int to = 0; to < numVertices; to++)
             {
                 if (currShape->connectivity[from][to] == 1)
                 {
-                    int fromx = scaleX(homogCurr[from][0]);
-                    int fromy = scaleY(homogCurr[from][1]);
+                    int fromx = scaleX(homogCurr[from * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
+                    int fromy = scaleY(homogCurr[from * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
 
-                    int tox = scaleX(homogCurr[to][0]);
-                    int toy = scaleY(homogCurr[to][1]);
+                    int tox = scaleX(homogCurr[to * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
+                    int toy = scaleY(homogCurr[to * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
 
                     int dist = dist(fromx, fromy, tox, toy);
 
@@ -131,8 +114,11 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
                 }
             }
         }
-
     }
+
+    
+
+
 
     // Set color values in framebuffer according to pixel values.
     for (int row = 0; row < SCREENHEIGHT; row++)
@@ -159,8 +145,8 @@ void displayVertices(std::vector<struct shape *> shapes, int * framebuf)
         }
     }
 
+    
 
-    std::cout << "Connecting took " << totalConnections << " us" << std::endl;
-    std::cout << std::endl << std::endl << std::endl;
+
 
 }
