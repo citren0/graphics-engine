@@ -24,6 +24,7 @@ void scaleHomogenous(double source[][4], int n)
 
 void scaleHomogenous1D(double * source, int n)
 {
+    #pragma omp parallel for
     for (int i = 0; i < n; i++)
     {
         source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];

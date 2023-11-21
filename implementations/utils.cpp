@@ -158,7 +158,23 @@ void copyMatrix1D(double * source, double * dest, int n)
 {
     int indices = n * NUMBER_OF_HOMOGENEOUS_COORDS;
 
-    for (int i = 0; i < indices; i++)
+    int numThreads = 4;
+
+    int indicesPerThread = indices / numThreads;
+
+    int i = 0;
+
+    #pragma omp parallel for
+    for (i = 0; i < indices; i += indicesPerThread)
+    {
+        for (int f = 0; f < indicesPerThread; f++)
+        {
+            dest[i + f] = source[i + f];
+        }
+    }
+
+    int leftOver = indices - (indicesPerThread * numThreads);
+    for (int i = leftOver; i < indices; i++)
     {
         dest[i] = source[i];
     }
@@ -183,6 +199,7 @@ void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGEN
 
 void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS], double * target, double * destination, int n)
 {
+    #pragma omp parallel for
     for (int i = 0; i < n; i++)
     {
         for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)

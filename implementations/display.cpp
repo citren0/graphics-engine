@@ -39,18 +39,20 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
         
     double * homogCurr = initVertices();
 
-
     matMatMult1D(projMat, vertices, homogCurr, maxVertices);
 
     scaleHomogenous1D(homogCurr, maxVertices);
 
     // Draw vertices of the shapes.
+    #pragma omp parallel for
     for (int i = 0; i < maxVertices; i++)
     {
 
+        int row = i * NUMBER_OF_HOMOGENEOUS_COORDS;
+
         // Unscaled coordinates are on the interval [-1,1]
-        int x = scaleX(homogCurr[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
-        int y = scaleY(homogCurr[i * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
+        int x = scaleX(homogCurr[row + 0]);
+        int y = scaleY(homogCurr[row + 1]);
 
         // Leave a small margin on each side of the display.
         if (x > 0 && x < SCREENWIDTH && y > 0 && y < SCREENHEIGHT)
@@ -64,62 +66,67 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
     int numShapes = shapes.size();
     struct shape * currShape;
 
-    for (int shape = 0; shape < numShapes; shape++)
-    {
-        currShape = shapes[shape];
-        int numVertices = currShape->numVertices;
+    int maxConnDistance = dist(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
-        for (int from = 0; from < numVertices; from++)
+    start = std::chrono::high_resolution_clock::now();
+        #pragma omp parallel for
+        for (int shape = 0; shape < numShapes; shape++)
         {
-            for (int to = 0; to < numVertices; to++)
+            currShape = shapes[shape];
+            int numVertices = currShape->numVertices;
+            double * homogCurrPos = homogCurr + (shape * MAX_VERTICES_PER_SHAPE * NUMBER_OF_HOMOGENEOUS_COORDS);
+
+            for (int from = 0; from < numVertices; from++)
             {
-                if (currShape->connectivity[from][to] == 1)
+                for (int to = 0; to < numVertices; to++)
                 {
-                    int fromx = scaleX(homogCurr[from * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
-                    int fromy = scaleY(homogCurr[from * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
-
-                    int tox = scaleX(homogCurr[to * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
-                    int toy = scaleY(homogCurr[to * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
-
-                    int dist = dist(fromx, fromy, tox, toy);
-
-                    // Investigate.
-                    if (dist > dist(0, 0, SCREENWIDTH, SCREENHEIGHT))
+                    if (currShape->connectivity[from][to] == 1)
                     {
-                        continue;
-                    }
+                        int fromx = scaleX(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
+                        int fromy = scaleY(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
 
-                    double xIncrement = (dist != 0) ? (double)(tox - fromx) / dist : 0.0;
-                    double yIncrement = (dist != 0) ? (double)(toy - fromy) / dist : 0.0;
+                        int tox = scaleX(homogCurrPos[to * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
+                        int toy = scaleY(homogCurrPos[to * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
 
-                    double currx = fromx;
-                    double curry = fromy;
+                        int dist = dist(fromx, fromy, tox, toy);
 
-                    // Problematic.
-                    for (int march = 0; march < dist; march++)
-                    {
-                        //printf("dist %d\n currx %f\n curry %f\n\n", dist, currx, curry);
-                        if (currx > 0 && currx < SCREENWIDTH && curry > 0 && curry < SCREENHEIGHT)
+                        // Investigate.
+                        if (dist > maxConnDistance)
                         {
-                            if (pixels[(int)curry][(int)currx] != 1)
-                            {
-                                pixels[(int)curry][(int)currx] = 2;
-                            }
+                            continue;
                         }
 
-                        currx += xIncrement;
-                        curry += yIncrement;
-                    }
+                        double xIncrement = (dist != 0) ? (double)(tox - fromx) / dist : 0.0;
+                        double yIncrement = (dist != 0) ? (double)(toy - fromy) / dist : 0.0;
 
+                        double currx = fromx;
+                        double curry = fromy;
+
+                        // Problematic.
+                        for (int march = 0; march < dist; march++)
+                        {
+                            //printf("dist %d\n currx %f\n curry %f\n\n", dist, currx, curry);
+                            if (currx > 0 && currx < SCREENWIDTH && curry > 0 && curry < SCREENHEIGHT)
+                            {
+                                if (pixels[(int)curry][(int)currx] != 1)
+                                {
+                                    pixels[(int)curry][(int)currx] = 2;
+                                }
+                            }
+
+                            currx += xIncrement;
+                            curry += yIncrement;
+                        }
+
+                    }
                 }
             }
         }
-    }
+    stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "Connecting took a total of " << duration.count()/1000 << " ms of processing." << std::endl;
 
     
-
-
-
     // Set color values in framebuffer according to pixel values.
     for (int row = 0; row < SCREENHEIGHT; row++)
     {
@@ -144,9 +151,5 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
             }
         }
     }
-
-    
-
-
 
 }

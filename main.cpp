@@ -152,10 +152,10 @@ int main(void)
                         pivotCameraPitch(vertices, -PI/64);
                         break;
                     case XK_j:
-                        pivotCameraYaw(vertices, PI/64);
+                        pivotCameraYaw(vertices, -PI/64);
                         break;
                     case XK_l:
-                        pivotCameraYaw(vertices, -PI/64);
+                        pivotCameraYaw(vertices, PI/64);
                         break;
                     default:
                         break;
@@ -174,7 +174,7 @@ int main(void)
 
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << "display and putimage took " << duration.count()/1000 << " ms of processing." << std::endl;
+        std::cout << "displayVertices took a total of " << duration.count()/1000 << " ms of processing." << std::endl;
         
 
         window.putImage();
