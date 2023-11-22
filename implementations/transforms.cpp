@@ -39,10 +39,11 @@ void scaleHomogenous1D(double * source, int n)
 void moveShapesLeft(double * targets)
 {
     // Matrices are stored with the vertical vectors contiguous in memory.
-    double operation[4][4] = {{1, 0, 0, 0},
-                             { 0, 1, 0, 0},
-                             { 0, 0, 1, 0},
-                             { 1, 0, 0, 1}};
+    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] =
+                            {1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             1, 0, 0, 1};
 
     applyTransform(targets, operation);
 }
@@ -50,10 +51,11 @@ void moveShapesLeft(double * targets)
 
 void moveShapesRight(double * targets)
 {
-    double operation[4][4] = {{1, 0, 0, 0},
-                             { 0, 1, 0, 0},
-                             { 0, 0, 1, 0},
-                             {-1, 0, 0, 1}};
+    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                            -1, 0, 0, 1};
 
     applyTransform(targets, operation);
 }
@@ -61,10 +63,11 @@ void moveShapesRight(double * targets)
 
 void moveShapesUp(double * targets)
 {
-    double operation[4][4] = {{1, 0, 0, 0},
-                             { 0, 1, 0, 0},
-                             { 0, 0, 1, 0},
-                             { 0, 1, 0, 1}};
+    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             0, 1, 0, 1};
 
     applyTransform(targets, operation);
 
@@ -73,10 +76,11 @@ void moveShapesUp(double * targets)
 
 void moveShapesDown(double * targets)
 {
-    double operation[4][4] = {{1, 0, 0, 0},
-                             { 0, 1, 0, 0},
-                             { 0, 0, 1, 0},
-                             { 0,-1, 0, 1}};
+    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             0,-1, 0, 1};
 
     applyTransform(targets, operation);
 }
@@ -84,10 +88,11 @@ void moveShapesDown(double * targets)
 
 void moveShapesIn(double * targets)
 {
-    double operation[4][4] = {{1, 0, 0, 0},
-                             { 0, 1, 0, 0},
-                             { 0, 0, 1, 0},
-                             { 0, 0, 1, 1}};
+    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             0, 0, 1, 1};
 
     applyTransform(targets, operation);
 }
@@ -95,10 +100,11 @@ void moveShapesIn(double * targets)
 
 void moveShapesOut(double * targets)
 {
-    double operation[4][4] = {{1, 0, 0, 0},
-                             { 0, 1, 0, 0},
-                             { 0, 0, 1, 0},
-                             { 0, 0,-1, 1}};
+    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {1, 0, 0, 0,
+                             0, 1, 0, 0,
+                             0, 0, 1, 0,
+                             0, 0,-1, 1};
 
 
     applyTransform(targets, operation);
@@ -121,20 +127,23 @@ void rotateShapesCCW(double * targets, struct location center, struct axis axisO
 
     if (axisOfRotation.z)
     {
-        double rotMat[4][4] = { {cos(thetaRads), sin(thetaRads), 0, 0}, 
-                                {-sin(thetaRads), cos(thetaRads), 0, 0},
-                                {0, 0, 1, 0},
-                                {0, 0, 0, 1}};
+        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {cos(thetaRads), sin(thetaRads), 0, 0, 
+                                 -sin(thetaRads), cos(thetaRads), 0, 0,
+                                 0, 0, 1, 0,
+                                 0, 0, 0, 1};
         
-        double trans1[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {-center.x, -center.y, -center.z, 1}};
+        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 -center.x, -center.y, -center.z, 1};
 
-        double trans2[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {center.x, center.y, center.z, 1}};
+        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 center.x, center.y, center.z, 1};
 
 
         applyTransform(targets, trans1);
@@ -143,20 +152,23 @@ void rotateShapesCCW(double * targets, struct location center, struct axis axisO
     }
     else if (axisOfRotation.x)
     {
-        double rotMat[4][4] = { {1, 0, 0, 0}, 
-                                {0, cos(thetaRads), sin(thetaRads), 0},
-                                {0, -sin(thetaRads), cos(thetaRads), 0},
-                                {0, 0, 0, 1}};
+        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0, 
+                                 0, cos(thetaRads), sin(thetaRads), 0,
+                                 0, -sin(thetaRads), cos(thetaRads), 0,
+                                 0, 0, 0, 1};
 
-        double trans1[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {-center.x, -center.y, -center.z, 1}};
+        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 -center.x, -center.y, -center.z, 1};
 
-        double trans2[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {center.x, center.y, center.z, 1}};
+        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 center.x, center.y, center.z, 1};
 
 
         applyTransform(targets, trans1);
@@ -165,20 +177,23 @@ void rotateShapesCCW(double * targets, struct location center, struct axis axisO
     }
     else if (axisOfRotation.y)
     {
-        double rotMat[4][4] = { {cos(thetaRads), 0, -sin(thetaRads), 0}, 
-                                {0, 1, 0, 0},
-                                {sin(thetaRads), 0, cos(thetaRads), 0},
-                                {0, 0, 0, 1}};
+        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {cos(thetaRads), 0, -sin(thetaRads), 0, 
+                                 0, 1, 0, 0,
+                                 sin(thetaRads), 0, cos(thetaRads), 0,
+                                 0, 0, 0, 1};
 
-        double trans1[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {-center.x, -center.y, -center.z, 1}};
+        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 -center.x, -center.y, -center.z, 1};
 
-        double trans2[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {center.x, center.y, center.z, 1}};
+        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 center.x, center.y, center.z, 1};
 
 
         applyTransform(targets, trans1);
@@ -200,20 +215,23 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
 
     if (axisOfRotation.z)
     {
-        double rotMat[4][4] = { {cos(thetaRads), sin(thetaRads), 0, 0}, 
-                                {-sin(thetaRads), cos(thetaRads), 0, 0},
-                                {0, 0, 1, 0},
-                                {0, 0, 0, 1}};
+        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {cos(thetaRads), sin(thetaRads), 0, 0, 
+                                 -sin(thetaRads), cos(thetaRads), 0, 0,
+                                 0, 0, 1, 0,
+                                 0, 0, 0, 1};
         
-        double trans1[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {-center.x, -center.y, -center.z, 1}};
+        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 -center.x, -center.y, -center.z, 1};
 
-        double trans2[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {center.x, center.y, center.z, 1}};
+        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 center.x, center.y, center.z, 1};
 
 
         applyTransform(targets, trans1);
@@ -222,20 +240,23 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
     }
     else if (axisOfRotation.x)
     {
-        double rotMat[4][4] = { {1, 0, 0, 0}, 
-                                {0, cos(thetaRads), sin(thetaRads), 0},
-                                {0, -sin(thetaRads), cos(thetaRads), 0},
-                                {0, 0, 0, 1}};
+        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0, 
+                                 0, cos(thetaRads), sin(thetaRads), 0,
+                                 0, -sin(thetaRads), cos(thetaRads), 0,
+                                 0, 0, 0, 1};
 
-        double trans1[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {-center.x, -center.y, -center.z, 1}};
+        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 -center.x, -center.y, -center.z, 1};
 
-        double trans2[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {center.x, center.y, center.z, 1}};
+        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 center.x, center.y, center.z, 1};
 
 
         applyTransform(targets, trans1);
@@ -244,20 +265,23 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
     }
     else if (axisOfRotation.y)
     {
-        double rotMat[4][4] = { {cos(thetaRads), 0, -sin(thetaRads), 0}, 
-                                {0, 1, 0, 0},
-                                {sin(thetaRads), 0, cos(thetaRads), 0},
-                                {0, 0, 0, 1}};
+        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {cos(thetaRads), 0, -sin(thetaRads), 0, 
+                                 0, 1, 0, 0,
+                                 sin(thetaRads), 0, cos(thetaRads), 0,
+                                 0, 0, 0, 1};
 
-        double trans1[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {-center.x, -center.y, -center.z, 1}};
+        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 -center.x, -center.y, -center.z, 1};
 
-        double trans2[4][4] = { {1, 0, 0, 0},
-                                {0, 1, 0, 0},
-                                {0, 0, 1, 0},
-                                {center.x, center.y, center.z, 1}};
+        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                                {1, 0, 0, 0,
+                                 0, 1, 0, 0,
+                                 0, 0, 1, 0,
+                                 center.x, center.y, center.z, 1};
 
 
         applyTransform(targets, trans1);
@@ -273,10 +297,11 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
 
 void pivotCameraPitch(double * targets, double angle)
 {
-    double rotMat[4][4] = { {1, 0, 0, 0}, 
-                            {0, cos(angle), sin(angle), 0},
-                            {0, -sin(angle), cos(angle), 0},
-                            {0, 0, 0, 1}};
+    double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {1, 0, 0, 0, 
+                             0, cos(angle), sin(angle), 0,
+                             0, -sin(angle), cos(angle), 0,
+                             0, 0, 0, 1};
 
     applyTransform(targets, rotMat);
     
@@ -285,10 +310,11 @@ void pivotCameraPitch(double * targets, double angle)
 
 void pivotCameraYaw(double * targets, double angle)
 {
-    double rotMat[4][4] = { {cos(angle), 0, -sin(angle), 0}, 
-                            {0, 1, 0, 0},
-                            {sin(angle), 0, cos(angle), 0},
-                            {0, 0, 0, 1}};
+    double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {cos(angle), 0, -sin(angle), 0, 
+                             0, 1, 0, 0,
+                             sin(angle), 0, cos(angle), 0,
+                             0, 0, 0, 1};
 
     applyTransform(targets, rotMat);
     

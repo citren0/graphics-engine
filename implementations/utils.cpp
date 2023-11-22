@@ -67,7 +67,7 @@ double * initVertices()
 // }
 
 
-void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS])
+void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS])
 {
     auto start = std::chrono::high_resolution_clock::now();
         double * final = (double *)malloc(MAX_SHAPES * MAX_VERTICES_PER_SHAPE * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double));
@@ -197,7 +197,7 @@ void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGEN
     }
 }
 
-void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS], double * target, double * destination, int n)
+void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS], double * target, double * destination, int n)
 {
     #pragma omp parallel for
     for (int i = 0; i < n; i++)
@@ -208,7 +208,7 @@ void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOG
 
             for (int j = 0; j < NUMBER_OF_HOMOGENEOUS_COORDS; j++)
             {
-                destination[i * NUMBER_OF_HOMOGENEOUS_COORDS + f] += operation[j][f] * target[i * NUMBER_OF_HOMOGENEOUS_COORDS + j];
+                destination[i * NUMBER_OF_HOMOGENEOUS_COORDS + f] += operation[j * NUMBER_OF_HOMOGENEOUS_COORDS + f] * target[i * NUMBER_OF_HOMOGENEOUS_COORDS + j];
             }
         }
     }

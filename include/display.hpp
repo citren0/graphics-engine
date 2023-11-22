@@ -11,7 +11,7 @@
 #define fov 45.0
 
 // Coefficient for projection matrix
-#define S 1/tan(fov*0.5*PI/180.0)
+#define S 1 / tan(fov*0.5*PI / 180.0)
 
 // Far and near clipping planes
 #define far 1.0

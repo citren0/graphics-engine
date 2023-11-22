@@ -49,7 +49,7 @@ void copyMatrix1D(double * source, double * dest, int n);
 
 void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS], double target[][NUMBER_OF_HOMOGENEOUS_COORDS], double destination[][NUMBER_OF_HOMOGENEOUS_COORDS], int n);
 
-void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS], double * target, double * destination, int n);
+void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS], double * target, double * destination, int n);
 
 void printMat(double mat[][4], int n);
 
@@ -61,4 +61,4 @@ void seperateVertices(std::vector<struct shape *> targets, double * final);
 
 int countVertices(std::vector<struct shape *> targets);
 
-void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS]);
+void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS]);
