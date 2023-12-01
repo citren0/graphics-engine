@@ -5,7 +5,7 @@
 
 #define PI 3.14159265
 
-#define MAX_SHAPES 1000000
+#define MAX_SHAPES 100
 #define MAX_VERTICES_PER_SHAPE 4
 #define NUMBER_OF_HOMOGENEOUS_COORDS 4
 #define MAX_CONNECTIONS_PER_VERTEX 4
@@ -31,7 +31,7 @@ struct shape
     // Stores the homogeneous coordinates of each vertex.
     double * vectors;
     // The connection matrix will store relationships between vertices
-    double connectivity[MAX_VERTICES_PER_SHAPE][MAX_VERTICES_PER_SHAPE];
+    std::vector<int> connections[MAX_VERTICES_PER_SHAPE];
     // Number of currently occupied vertex spots for the shape.
     int numVertices;
 };

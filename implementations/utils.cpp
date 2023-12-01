@@ -17,11 +17,6 @@ void initShape(struct shape * target, double * vectors, int numShapes)
     for (int i = 0; i < MAX_VERTICES_PER_SHAPE; i++)
     {
         // Initialize each vertex to all zeroes.
-        for (int f = 0; f < MAX_VERTICES_PER_SHAPE; f++)
-        {
-            target->connectivity[i][f] = 0;
-        }
-
         for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
         {
             target->vectors[i * NUMBER_OF_HOMOGENEOUS_COORDS + f] = 0.0;
@@ -34,37 +29,6 @@ double * initVertices()
 {
     return (double *)malloc(NUMBER_OF_HOMOGENEOUS_COORDS * MAX_VERTICES_PER_SHAPE * MAX_SHAPES * sizeof(double));
 }
-
-
-// combinedVertices must have the correct number of rows, equal to the total number of vertices in targets.
-// void combineVertices(std::vector<struct shape *> targets, double * combinedVertices)
-// {
-//     int numTargets = targets.size();
-//     int row = 0;
-//     //double * currIndex = combinedVertices;
-
-//     for (int shape = 0; shape < numTargets; shape++)
-//     {
-//         int vertices = targets[shape]->numVertices;
-//         struct shape * currShape = targets[shape];
-
-//         for (int vertex = 0; vertex < vertices; vertex++)
-//         {
-
-//             combinedVertices[row * NUMBER_OF_HOMOGENEOUS_COORDS + 0] = currShape->vectors[vertex][0];
-//             combinedVertices[row * NUMBER_OF_HOMOGENEOUS_COORDS + 1] = currShape->vectors[vertex][1];
-//             combinedVertices[row * NUMBER_OF_HOMOGENEOUS_COORDS + 2] = currShape->vectors[vertex][2];
-//             combinedVertices[row * NUMBER_OF_HOMOGENEOUS_COORDS + 3] = currShape->vectors[vertex][3];
-            
-//             // for (int coordinate = 0; coordinate < NUMBER_OF_HOMOGENEOUS_COORDS; coordinate++)
-//             // {
-//             //     *(currIndex++) = currShape->vectors[vertex][coordinate];
-//             // }
-
-//             row++;
-//         }
-//     }
-// }
 
 
 void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS])
@@ -136,8 +100,7 @@ int addVertexToShape(struct shape * target, struct location point)
 
 int addConnectionToShape(struct shape * target, int source, int destination)
 {
-    target->connectivity[source][destination] = 1;
-
+    target->connections[source].push_back(destination);
     return 0;
 }
 

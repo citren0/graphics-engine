@@ -5,7 +5,6 @@
 
 #define SCREENWIDTH 3000
 #define SCREENHEIGHT 2000
-#define MAXCONNECTIONS 4
 
 // Field of View in degrees
 #define fov 45.0

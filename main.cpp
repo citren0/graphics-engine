@@ -40,7 +40,7 @@ int main(void)
     double * vertices = initVertices();
 
     struct shape * square;
-    int gridSize = 1000;
+    int gridSize = 10;
     for (int i = 0; i < gridSize; i++)
     {
         for (int f = 0; f < gridSize; f++)
@@ -78,6 +78,8 @@ int main(void)
     //     exit(1);
     // }
 
+    // initShape(square, vertices, shapes.size());
+
     // while (getline(f, str))
     // {
     //     if (str[0] == 'v')
@@ -96,7 +98,6 @@ int main(void)
     // }
     // shapes.push_back(square);
 
-    // printMat(square->vectors, square->numVertices);
 
 
 

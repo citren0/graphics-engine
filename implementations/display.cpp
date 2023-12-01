@@ -44,9 +44,11 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
 
     scaleHomogenous1D(homogCurr, maxVertices);
 
+    int maxVerticesToConsider = shapes.size() * MAX_VERTICES_PER_SHAPE;
+
     // Draw vertices of the shapes.
     #pragma omp parallel for
-    for (int i = 0; i < maxVertices; i++)
+    for (int i = 0; i < maxVerticesToConsider; i++)
     {
 
         int row = i * NUMBER_OF_HOMOGENEOUS_COORDS;
@@ -79,47 +81,48 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
 
             for (int from = 0; from < numVertices; from++)
             {
-                for (int to = 0; to < numVertices; to++)
+                int numConnections = currShape->connections[from].size();
+
+                for (int toIndex = 0; toIndex < numConnections; toIndex++)
                 {
-                    if (currShape->connectivity[from][to] == 1)
+                    int to = currShape->connections[from][toIndex];
+
+                    int fromx = scaleX(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
+                    int fromy = scaleY(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
+
+                    int tox = scaleX(homogCurrPos[to * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
+                    int toy = scaleY(homogCurrPos[to * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
+
+                    int dist = dist(fromx, fromy, tox, toy);
+
+                    // Investigate.
+                    if (dist > maxConnDistance)
                     {
-                        int fromx = scaleX(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
-                        int fromy = scaleY(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
-
-                        int tox = scaleX(homogCurrPos[to * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
-                        int toy = scaleY(homogCurrPos[to * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
-
-                        int dist = dist(fromx, fromy, tox, toy);
-
-                        // Investigate.
-                        if (dist > maxConnDistance)
-                        {
-                            continue;
-                        }
-
-                        double xIncrement = (dist != 0) ? (double)(tox - fromx) / dist : 0.0;
-                        double yIncrement = (dist != 0) ? (double)(toy - fromy) / dist : 0.0;
-
-                        double currx = fromx;
-                        double curry = fromy;
-
-                        // Problematic.
-                        for (int march = 0; march < dist; march++)
-                        {
-                            //printf("dist %d\n currx %f\n curry %f\n\n", dist, currx, curry);
-                            if (currx > 0 && currx < SCREENWIDTH && curry > 0 && curry < SCREENHEIGHT)
-                            {
-                                if (pixels[(int)curry][(int)currx] != 1)
-                                {
-                                    pixels[(int)curry][(int)currx] = 2;
-                                }
-                            }
-
-                            currx += xIncrement;
-                            curry += yIncrement;
-                        }
-
+                        continue;
                     }
+
+                    int xIncrement = (dist != 0) ? (tox - fromx) / dist : 0;
+                    int yIncrement = (dist != 0) ? (toy - fromy) / dist : 0;
+
+                    int currx = fromx;
+                    int curry = fromy;
+
+                    // Problematic.
+                    for (int march = 0; march < dist; march++)
+                    {
+                        //printf("dist %d\n currx %f\n curry %f\n\n", dist, currx, curry);
+                        if (currx > 0 && currx < SCREENWIDTH && curry > 0 && curry < SCREENHEIGHT)
+                        {
+                            if (pixels[(int)curry][(int)currx] != 1)
+                            {
+                                pixels[(int)curry][(int)currx] = 2;
+                            }
+                        }
+
+                        currx += xIncrement;
+                        curry += yIncrement;
+                    }
+
                 }
             }
         }
