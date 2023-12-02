@@ -15,7 +15,7 @@
 #include "./include/utils.hpp"
 #include "./include/transforms.hpp"
 #include "./include/window.hpp"
-
+#include "./include/gpu.hpp"
 
 // 33 fps lock.
 #define FRAMETIME 30000
@@ -32,6 +32,8 @@ int main(void)
     X11Window window;
 
     window.init_x();
+
+    initMatMatMultGPU(getProjMat(), MAX_VERTICES_PER_SHAPE * MAX_SHAPES, NUMBER_OF_HOMOGENEOUS_COORDS);
 
     framebuf = window.getFrameBuffer();
 
@@ -180,6 +182,9 @@ int main(void)
         usleep(duration.count() < FRAMETIME ? FRAMETIME-duration.count() : 0);
 
     }
+
+
+    freeOpenCLKernel();
 
     return 0;
 }

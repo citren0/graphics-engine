@@ -188,14 +188,14 @@ void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMO
 }
 
 
-void printMat(double mat[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
+void printMat(double * mat, int numRows)
 {
-    for (int i = 0; i < n; i++)
+    for (int i = 0; i < numRows; i++)
     {
         printf("\n");
         for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
         {
-            printf("%f ", mat[i][f]);
+            printf("%f ", mat[i * NUMBER_OF_HOMOGENEOUS_COORDS + f]);
         }
     }
 }

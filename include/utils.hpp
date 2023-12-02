@@ -53,7 +53,7 @@ void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGEN
 
 void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS], double * target, double * destination, int n);
 
-void printMat(double mat[][4], int n);
+void printMat(double * mat, int numRows);
 
 void initShape(struct shape * target, double * vectors, int numShapes);
 

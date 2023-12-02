@@ -24,6 +24,8 @@
 #define xInBounds(x) ((x < 0.95) && (x > -0.95))
 #define yInBounds(y) ((y < 0.95) && (y > -0.95))
 
+double * getProjMat();
+
 void initBuf(char buf[SCREENHEIGHT][SCREENWIDTH]);
 
 void displayVertices(std::vector<struct shape *> shapes, double * vertices, int * framebuf);

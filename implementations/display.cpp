@@ -6,6 +6,8 @@
 
 #include "../include/display.hpp"
 #include "../include/transforms.hpp"
+#include "../include/gpu.hpp"
+
 
 
 double projMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
@@ -13,6 +15,13 @@ double projMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] =
                          0, S, 0, 0,
                          0, 0, -(far+near)/(far-near), -1,
                          0, 0, (-2.0 * far * near)/(far-near), 0};
+
+
+
+double * getProjMat()
+{
+    return projMat;
+}
 
 
 void initBuffer(char buf[SCREENHEIGHT][SCREENWIDTH])
@@ -41,7 +50,8 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
     double * homogCurr = initVertices();
 
     start = std::chrono::high_resolution_clock::now();
-    matMatMult1D(projMat, vertices, homogCurr, maxVerticesToConsider);
+    gpuMatMatMult(vertices, homogCurr, maxVerticesToConsider, NUMBER_OF_HOMOGENEOUS_COORDS);
+    //matMatMult1D(projMat, vertices, homogCurr, maxVerticesToConsider);
     scaleHomogenous1D(homogCurr, maxVerticesToConsider);
     stop = std::chrono::high_resolution_clock::now();
     auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
@@ -79,7 +89,7 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
     int maxConnDistance = dist(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
     start = std::chrono::high_resolution_clock::now();
-        //#pragma omp parallel for
+        #pragma omp parallel for
         for (int shape = 0; shape < numShapes; shape++)
         {
             currShape = shapes[shape];
