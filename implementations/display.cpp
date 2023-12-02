@@ -31,22 +31,26 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
 {
     std::chrono::time_point<std::chrono::high_resolution_clock> start;
     std::chrono::time_point<std::chrono::high_resolution_clock> stop;
+    
+    int maxVerticesToConsider = shapes.size() * MAX_VERTICES_PER_SHAPE;
 
     char pixels[SCREENHEIGHT][SCREENWIDTH];
 
     initBuffer(pixels);
-    
-    int maxVertices = MAX_SHAPES * MAX_VERTICES_PER_SHAPE;
-        
+
     double * homogCurr = initVertices();
 
-    matMatMult1D(projMat, vertices, homogCurr, maxVertices);
+    start = std::chrono::high_resolution_clock::now();
+    matMatMult1D(projMat, vertices, homogCurr, maxVerticesToConsider);
+    scaleHomogenous1D(homogCurr, maxVerticesToConsider);
+    stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "Projection and scaling took a total of " << duration.count()/1000 << " ms of processing." << std::endl;
 
-    scaleHomogenous1D(homogCurr, maxVertices);
-
-    int maxVerticesToConsider = shapes.size() * MAX_VERTICES_PER_SHAPE;
+    
 
     // Draw vertices of the shapes.
+    start = std::chrono::high_resolution_clock::now();
     #pragma omp parallel for
     for (int i = 0; i < maxVerticesToConsider; i++)
     {
@@ -64,6 +68,9 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
         }
 
     }
+    stop = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "Writing Vertices took a total of " << duration.count()/1000 << " ms of processing." << std::endl;
 
 
     int numShapes = shapes.size();
@@ -72,7 +79,7 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
     int maxConnDistance = dist(0, 0, SCREENWIDTH, SCREENHEIGHT);
 
     start = std::chrono::high_resolution_clock::now();
-        #pragma omp parallel for
+        //#pragma omp parallel for
         for (int shape = 0; shape < numShapes; shape++)
         {
             currShape = shapes[shape];
@@ -81,11 +88,14 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
 
             for (int from = 0; from < numVertices; from++)
             {
-                int numConnections = currShape->connections[from].size();
+                // "from" is a global indicator of which vertex we are on.
+                int fromVertex = from % MAX_VERTICES_PER_SHAPE;
+
+                int numConnections = currShape->connsEachVertex[fromVertex];
 
                 for (int toIndex = 0; toIndex < numConnections; toIndex++)
                 {
-                    int to = currShape->connections[from][toIndex];
+                    int to = currShape->connections[fromVertex][toIndex];
 
                     int fromx = scaleX(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 0]);
                     int fromy = scaleY(homogCurrPos[from * NUMBER_OF_HOMOGENEOUS_COORDS + 1]);
@@ -95,19 +105,17 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
 
                     int dist = dist(fromx, fromy, tox, toy);
 
-                    // Investigate.
                     if (dist > maxConnDistance)
                     {
                         continue;
                     }
 
-                    int xIncrement = (dist != 0) ? (tox - fromx) / dist : 0;
-                    int yIncrement = (dist != 0) ? (toy - fromy) / dist : 0;
+                    double xIncrement = (dist != 0) ? (tox - fromx) / (double)dist : 0.0;
+                    double yIncrement = (dist != 0) ? (toy - fromy) / (double)dist : 0.0;
 
-                    int currx = fromx;
-                    int curry = fromy;
+                    double currx = fromx;
+                    double curry = fromy;
 
-                    // Problematic.
                     for (int march = 0; march < dist; march++)
                     {
                         //printf("dist %d\n currx %f\n curry %f\n\n", dist, currx, curry);
@@ -127,10 +135,10 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
             }
         }
     stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "Connecting took a total of " << duration.count()/1000 << " ms of processing." << std::endl;
 
-    
+    start = std::chrono::high_resolution_clock::now();
     // Set color values in framebuffer according to pixel values.
     for (int row = 0; row < SCREENHEIGHT; row++)
     {
@@ -155,5 +163,8 @@ void displayVertices(vector<struct shape *> shapes, double * vertices, int * fra
             }
         }
     }
+    stop = std::chrono::high_resolution_clock::now();
+    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    std::cout << "Copying to Framebuffer took a total of " << duration.count()/1000 << " ms of processing." << std::endl;
 
 }

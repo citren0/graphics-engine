@@ -40,7 +40,7 @@ int main(void)
     double * vertices = initVertices();
 
     struct shape * square;
-    int gridSize = 10;
+    int gridSize = 1000;
     for (int i = 0; i < gridSize; i++)
     {
         for (int f = 0; f < gridSize; f++)
@@ -54,6 +54,7 @@ int main(void)
             }
 
             initShape(square, vertices, shapes.size());
+
             addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
             addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
             addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
@@ -106,17 +107,13 @@ int main(void)
 
         XNextEvent(window.getDisplay(), &event);
 
-        int ks;
+        int ks;// = XK_f;
 
-        event.type = KeyPress;
-
-        std::chrono::time_point<std::chrono::high_resolution_clock> start;
+        //event.type = KeyPress;
 
         switch (event.type)
         {
             case KeyPress:
-
-                
 
                 ks = XLookupKeysym(&(event.xkey), 0);
 
@@ -169,10 +166,9 @@ int main(void)
         printf("\n");
 
         
-        start = std::chrono::high_resolution_clock::now();
-
-        displayVertices(shapes, vertices, framebuf);
-
+        std::cout << "\nDISPLAYING VERTICES\n\n";
+        auto start = std::chrono::high_resolution_clock::now();
+            displayVertices(shapes, vertices, framebuf);
         auto stop = std::chrono::high_resolution_clock::now();
         auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
         std::cout << "displayVertices took a total of " << duration.count()/1000 << " ms of processing." << std::endl;

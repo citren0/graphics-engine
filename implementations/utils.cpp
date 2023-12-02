@@ -16,6 +16,8 @@ void initShape(struct shape * target, double * vectors, int numShapes)
     
     for (int i = 0; i < MAX_VERTICES_PER_SHAPE; i++)
     {
+        target->connsEachVertex[i] = 0;
+
         // Initialize each vertex to all zeroes.
         for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
         {
@@ -33,11 +35,9 @@ double * initVertices()
 
 void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS])
 {
-    auto start = std::chrono::high_resolution_clock::now();
-        double * final = (double *)malloc(MAX_SHAPES * MAX_VERTICES_PER_SHAPE * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double));
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "malloc took " << duration.count()/1000 << " ms of processing." << std::endl;
+    std::cout << "\n\nAPPLYING TRANSFORM.\n";
+
+    double * final = (double *)malloc(MAX_SHAPES * MAX_VERTICES_PER_SHAPE * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double));
 
     if (!final)
     {
@@ -45,10 +45,10 @@ void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_CO
         exit(1);
     }
 
-    start = std::chrono::high_resolution_clock::now();
+    auto start = std::chrono::high_resolution_clock::now();
         matMatMult1D(transform, vertices, final, MAX_SHAPES * MAX_VERTICES_PER_SHAPE);
-    stop = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
+    auto stop = std::chrono::high_resolution_clock::now();
+    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
     std::cout << "matmatmult took " << duration.count()/1000 << " ms of processing." << std::endl;
 
     start = std::chrono::high_resolution_clock::now();
@@ -100,8 +100,18 @@ int addVertexToShape(struct shape * target, struct location point)
 
 int addConnectionToShape(struct shape * target, int source, int destination)
 {
-    target->connections[source].push_back(destination);
-    return 0;
+    int numConnsSourceVertex = target->connsEachVertex[source];
+
+    if (numConnsSourceVertex < MAX_CONNECTIONS_PER_VERTEX)
+    {
+        target->connections[source][numConnsSourceVertex] = destination;
+
+        target->connsEachVertex[source] += 1;
+
+        return 0;
+    }
+    
+    return 1;
 }
 
 
