@@ -1,13 +1,8 @@
 #pragma once
 #include <cmath>
 #include "utils.hpp"
+#include "constants.hpp"
 #include <vector>
-
-#define SCREENWIDTH 3000
-#define SCREENHEIGHT 2000
-
-// Field of View in degrees
-#define fov 45.0
 
 // Coefficient for projection matrix
 #define S 1 / tan(fov*0.5*PI / 180.0)
@@ -26,6 +21,6 @@
 
 double * getProjMat();
 
-void initBuf(char buf[SCREENHEIGHT][SCREENWIDTH]);
+void initBuf(char buf[SCREENHEIGHT * SCREENWIDTH]);
 
 void displayVertices(std::vector<struct shape *> shapes, double * vertices, int * framebuf);

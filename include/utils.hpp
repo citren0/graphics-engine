@@ -1,14 +1,8 @@
 #pragma once
 #include <vector>
+#include "constants.hpp"
 
 #define UNUSED(x) (void)x
-
-#define PI 3.14159265
-
-#define MAX_SHAPES 1000000
-#define MAX_VERTICES_PER_SHAPE 4
-#define NUMBER_OF_HOMOGENEOUS_COORDS 4
-#define MAX_CONNECTIONS_PER_VERTEX 4
 
 
 struct location
@@ -30,18 +24,12 @@ struct shape
 {
     // Stores the homogeneous coordinates of each vertex.
     double * vectors;
-    // This array will store the number of connections for each shape.
-    int connsEachVertex[MAX_VERTICES_PER_SHAPE];
-    // The connection matrix will store relationships between vertices
-    int connections[MAX_VERTICES_PER_SHAPE][MAX_CONNECTIONS_PER_VERTEX];
     // Number of currently occupied vertex spots for the shape.
     int numVertices;
 };
 
 
 double * initVertices();
-
-int addConnectionToShape(struct shape * target, int source, int destination);
 
 int addVertexToShape(struct shape * target, struct location point);
 

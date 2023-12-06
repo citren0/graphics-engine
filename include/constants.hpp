@@ -1,0 +1,12 @@
+#define PI 3.14159265
+
+#define MAX_SHAPES 1000000
+#define MAX_VERTICES_PER_SHAPE 4
+#define NUMBER_OF_HOMOGENEOUS_COORDS 4
+#define MAX_CONNECTIONS_PER_VERTEX 4
+
+#define SCREENWIDTH 3000
+#define SCREENHEIGHT 2000
+
+// Field of View in degrees
+#define fov 45.0

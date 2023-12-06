@@ -33,7 +33,7 @@ int main(void)
 
     window.init_x();
 
-    initMatMatMultGPU(getProjMat(), MAX_VERTICES_PER_SHAPE * MAX_SHAPES, NUMBER_OF_HOMOGENEOUS_COORDS);
+    initMatMatMultGPU(MAX_VERTICES_PER_SHAPE * MAX_SHAPES);
 
     framebuf = window.getFrameBuffer();
 
@@ -62,14 +62,11 @@ int main(void)
             addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
             addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
 
-            addConnectionToShape(square, 0, 2);
-            addConnectionToShape(square, 2, 1);
-            addConnectionToShape(square, 1, 3);
-            addConnectionToShape(square, 3, 0);
-
             shapes.push_back(square);
         }
     }
+
+    writeVerticesToGPU(vertices, MAX_SHAPES * MAX_VERTICES_PER_SHAPE);
 
     // struct shape * square;
     // std::fstream f("object.obj" , std::ios::in);
@@ -102,16 +99,16 @@ int main(void)
     // shapes.push_back(square);
 
 
+    bool exit = false;
+    bool render = true;
+    int ks;
 
-
-    for (;;)
+    while (!exit)
     {
 
+        render = true;
+
         XNextEvent(window.getDisplay(), &event);
-
-        int ks;// = XK_f;
-
-        //event.type = KeyPress;
 
         switch (event.type)
         {
@@ -157,7 +154,12 @@ int main(void)
                     case XK_l:
                         pivotCameraYaw(vertices, PI/64);
                         break;
+                    case XK_Escape:
+                        render = false;
+                        exit = true;
+                        break;
                     default:
+                        render = false;
                         break;
                 }
                 break;
@@ -165,21 +167,11 @@ int main(void)
                 break;
         }
 
-        printf("\n");
-
-        
-        std::cout << "\nDISPLAYING VERTICES\n\n";
-        auto start = std::chrono::high_resolution_clock::now();
+        if (render)
+        {
             displayVertices(shapes, vertices, framebuf);
-        auto stop = std::chrono::high_resolution_clock::now();
-        auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-        std::cout << "displayVertices took a total of " << duration.count()/1000 << " ms of processing." << std::endl;
-        
-
-        window.putImage();
-
-
-        usleep(duration.count() < FRAMETIME ? FRAMETIME-duration.count() : 0);
+            window.putImage();
+        }
 
     }
 

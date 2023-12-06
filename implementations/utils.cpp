@@ -16,8 +16,6 @@ void initShape(struct shape * target, double * vectors, int numShapes)
     
     for (int i = 0; i < MAX_VERTICES_PER_SHAPE; i++)
     {
-        target->connsEachVertex[i] = 0;
-
         // Initialize each vertex to all zeroes.
         for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
         {
@@ -95,23 +93,6 @@ int addVertexToShape(struct shape * target, struct location point)
     target->numVertices++;
 
     return 0;
-}
-
-
-int addConnectionToShape(struct shape * target, int source, int destination)
-{
-    int numConnsSourceVertex = target->connsEachVertex[source];
-
-    if (numConnsSourceVertex < MAX_CONNECTIONS_PER_VERTEX)
-    {
-        target->connections[source][numConnsSourceVertex] = destination;
-
-        target->connsEachVertex[source] += 1;
-
-        return 0;
-    }
-    
-    return 1;
 }
 
 

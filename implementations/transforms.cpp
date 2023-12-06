@@ -6,21 +6,11 @@
 
 #include "../include/transforms.hpp"
 #include "../include/utils.hpp"
+#include "../include/gpu.hpp"
 
 using namespace std;
 
-
-void scaleHomogenous(double source[][4], int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        source[i][0] = source[i][0] / source[i][3];
-        source[i][1] = source[i][1] / source[i][3];
-        source[i][2] = source[i][2] / source[i][3];
-        source[i][3] = source[i][3] / source[i][3];
-    }
-}
-
+#define MAXVERTICES MAX_SHAPES * MAX_VERTICES_PER_SHAPE
 
 void scaleHomogenous1D(double * source, int n)
 {
@@ -45,7 +35,7 @@ void moveShapesLeft(double * targets)
                              0, 0, 1, 0,
                              1, 0, 0, 1};
 
-    applyTransform(targets, operation);
+    gpuTransform(operation, MAXVERTICES);
 }
 
 
@@ -57,7 +47,7 @@ void moveShapesRight(double * targets)
                              0, 0, 1, 0,
                             -1, 0, 0, 1};
 
-    applyTransform(targets, operation);
+    gpuTransform(operation, MAXVERTICES);
 }
 
 
@@ -69,7 +59,7 @@ void moveShapesUp(double * targets)
                              0, 0, 1, 0,
                              0, 1, 0, 1};
 
-    applyTransform(targets, operation);
+    gpuTransform(operation, MAXVERTICES);
 
 }
 
@@ -82,7 +72,7 @@ void moveShapesDown(double * targets)
                              0, 0, 1, 0,
                              0,-1, 0, 1};
 
-    applyTransform(targets, operation);
+    gpuTransform(operation, MAXVERTICES);
 }
 
 
@@ -94,7 +84,7 @@ void moveShapesIn(double * targets)
                              0, 0, 1, 0,
                              0, 0, 1, 1};
 
-    applyTransform(targets, operation);
+    gpuTransform(operation, MAXVERTICES);
 }
 
 
@@ -107,7 +97,7 @@ void moveShapesOut(double * targets)
                              0, 0,-1, 1};
 
 
-    applyTransform(targets, operation);
+    gpuTransform(operation, MAXVERTICES);
 }
 
 
