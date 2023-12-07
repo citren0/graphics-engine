@@ -1,2 +1,9 @@
-gpu-ize scale homogeneous
-gpu-ize other matmatmult
+Remove left-over functions.
+Restructure as needed.
+Add debug compile flag for kernel timing printing.
+Need to change shapes to contain polygons which have normal vectors.
+    - Figure out how to efficiently copy shapes into opencl
+        - Structs cannot contain pointers, but simple structs may be passed into opencl kernels.
+    - Struct vector contains double arr size numhomogcoords, use for normal vectors and for each vertex?
+Once that is done and all functions have been changed to accomodate this, calculate normal vectors of polygons when they're added. OBJ files include this data automatically.
+Polygon fill algorithm, use the difference between normal vectors and camera vector to modify darkness so detail can be seen.

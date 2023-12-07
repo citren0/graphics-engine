@@ -11,10 +11,10 @@
 
 
 double projMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
-                        {S, 0, 0, 0,
-                         0, S, 0, 0,
-                         0, 0, -(far+near)/(far-near), -1,
-                         0, 0, (-2.0 * far * near)/(far-near), 0};
+        {S, 0, 0, 0,
+         0, S, 0, 0,
+         0, 0, -(far+near)/(far-near), -1,
+         0, 0, (-2.0 * far * near)/(far-near), 0};
 
 
 

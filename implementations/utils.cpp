@@ -1,10 +1,8 @@
 
-#include <chrono>
 #include <iostream>
 #include <string>
 #include <cmath>
 #include <vector>
-#include <omp.h>
 
 #include "../include/utils.hpp"
 
@@ -31,22 +29,6 @@ double * initVertices()
 }
 
 
-// Under the C++ standard, vectors shall be contiguous in memory.
-int countVertices(std::vector<struct shape *> targets)
-{
-    int totalVertices = 0;
-    int numTargets = targets.size();
-
-    for (int i = 0; i < numTargets; i++)
-    {
-        totalVertices += targets[i]->numVertices;
-    }
-
-
-    return totalVertices;
-}
-
-
 int addVertexToShape(struct shape * target, struct location point)
 {
     int numVertices = target->numVertices;
@@ -65,18 +47,6 @@ int addVertexToShape(struct shape * target, struct location point)
     target->numVertices++;
 
     return 0;
-}
-
-
-void copyMatrix(double source[][NUMBER_OF_HOMOGENEOUS_COORDS], double dest[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
-        {
-            dest[i][f] = source[i][f];
-        }
-    }
 }
 
 
@@ -103,40 +73,6 @@ void copyMatrix1D(double * source, double * dest, int n)
     for (int i = leftOver; i < indices; i++)
     {
         dest[i] = source[i];
-    }
-}
-
-
-void matMatMult(double operation[NUMBER_OF_HOMOGENEOUS_COORDS][NUMBER_OF_HOMOGENEOUS_COORDS], double target[][NUMBER_OF_HOMOGENEOUS_COORDS], double destination[][NUMBER_OF_HOMOGENEOUS_COORDS], int n)
-{
-    for (int i = 0; i < n; i++)
-    {
-        for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
-        {
-            destination[i][f] = 0;
-
-            for (int j = 0; j < NUMBER_OF_HOMOGENEOUS_COORDS; j++)
-            {
-                destination[i][f] += operation[j][f] * target[i][j];
-            }
-        }
-    }
-}
-
-void matMatMult1D(double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS], double * target, double * destination, int n)
-{
-    #pragma omp parallel for
-    for (int i = 0; i < n; i++)
-    {
-        for (int f = 0; f < NUMBER_OF_HOMOGENEOUS_COORDS; f++)
-        {
-            destination[i * NUMBER_OF_HOMOGENEOUS_COORDS + f] = 0;
-
-            for (int j = 0; j < NUMBER_OF_HOMOGENEOUS_COORDS; j++)
-            {
-                destination[i * NUMBER_OF_HOMOGENEOUS_COORDS + f] += operation[j * NUMBER_OF_HOMOGENEOUS_COORDS + f] * target[i * NUMBER_OF_HOMOGENEOUS_COORDS + j];
-            }
-        }
     }
 }
 

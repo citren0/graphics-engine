@@ -3,6 +3,11 @@
 #include <cstddef>
 #include <time.h>
 #include <unistd.h>
+#include <math.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <time.h>
 #include "../include/gpu.hpp"
 #include "../include/utils.hpp"
 #include "../include/display.hpp"
@@ -15,6 +20,7 @@
 #define KERNEL_FUNC_POPULATEFRAMEBUFFER "populateFramebuffer"
 #define KERNEL_FUNC_COPYMATRIX "copyMatrix" 
 #define KERNEL_FUNC_INITIALIZEPIXELS "initializePixels"
+
 
 cl_device_id device;
 cl_context context;

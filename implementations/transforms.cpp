@@ -7,11 +7,7 @@
 #include "../include/transforms.hpp"
 #include "../include/utils.hpp"
 #include "../include/gpu.hpp"
-
-using namespace std;
-
-#define MAXVERTICES MAX_SHAPES * MAX_VERTICES_PER_SHAPE
-
+#include "../include/constants.hpp"
 
 // make the factor of movement changeable.
 void moveShapesLeft(double * targets)

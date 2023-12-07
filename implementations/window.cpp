@@ -2,11 +2,10 @@
 #include <cstdlib>
 #include <cstdio>
 
-// X11 libraries
+// X11 and supporting libraries
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 #include <X11/Xos.h>
-
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
@@ -110,6 +109,7 @@ void X11Window::putImage(void)
     XShmPutImage(dpy, win, NormalGC, ximage, 0, 0, 0, 0, SCREENWIDTH, SCREENHEIGHT, false);
     XFlush(dpy);
 }
+
 
 Display * X11Window::getDisplay(void)
 {
