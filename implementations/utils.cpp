@@ -31,34 +31,6 @@ double * initVertices()
 }
 
 
-void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS])
-{
-    std::cout << "\n\nAPPLYING TRANSFORM.\n";
-
-    double * final = (double *)malloc(MAX_SHAPES * MAX_VERTICES_PER_SHAPE * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double));
-
-    if (!final)
-    {
-        std::cout << "Malloc failed.\n";
-        exit(1);
-    }
-
-    auto start = std::chrono::high_resolution_clock::now();
-        matMatMult1D(transform, vertices, final, MAX_SHAPES * MAX_VERTICES_PER_SHAPE);
-    auto stop = std::chrono::high_resolution_clock::now();
-    auto duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "matmatmult took " << duration.count()/1000 << " ms of processing." << std::endl;
-
-    start = std::chrono::high_resolution_clock::now();
-        copyMatrix1D(final, vertices, MAX_SHAPES * MAX_VERTICES_PER_SHAPE);
-    stop = std::chrono::high_resolution_clock::now();
-    duration = std::chrono::duration_cast<std::chrono::microseconds>(stop - start);
-    std::cout << "copy matrix took " << duration.count()/1000 << " ms of processing." << std::endl;
-
-    free(final);
-}
-
-
 // Under the C++ standard, vectors shall be contiguous in memory.
 int countVertices(std::vector<struct shape *> targets)
 {

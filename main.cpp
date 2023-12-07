@@ -41,62 +41,74 @@ int main(void)
 
     double * vertices = initVertices();
 
+    // struct shape * square;
+    // int gridSize = 1000;
+    // for (int i = 0; i < gridSize; i++)
+    // {
+    //     for (int f = 0; f < gridSize; f++)
+    //     {
+    //         square = (struct shape *)malloc(sizeof(struct shape));
+
+    //         if (square == NULL)
+    //         {
+    //             printf("Malloc failed.\n");
+    //             exit(1);
+    //         }
+
+    //         initShape(square, vertices, shapes.size());
+
+    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
+    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
+    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
+    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
+
+    //         shapes.push_back(square);
+    //     }
+    // }
+
     struct shape * square;
-    int gridSize = 1000;
-    for (int i = 0; i < gridSize; i++)
+    
+
+    int gridCats = 10;
+    for (int i = 0; i < gridCats; i++)
     {
-        for (int f = 0; f < gridSize; f++)
+        for (int j = 0; j < gridCats; j++)
         {
+            std::fstream f("object.obj" , std::ios::in);
+            std::string str;
+
             square = (struct shape *)malloc(sizeof(struct shape));
 
             if (square == NULL)
             {
-                printf("Malloc failed.\n");
                 exit(1);
             }
 
             initShape(square, vertices, shapes.size());
 
-            addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
-            addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
-            addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
-            addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
+            while (getline(f, str))
+            {
+                if (str[0] == 'v')
+                {
+                    
+                    std::stringstream strstream;
+                    strstream << str;
+                    char v;
+                    double a, b, c;
+                    strstream >> v >> a >> b >> c;
 
+                    addVertexToShape(square, (struct location){a + 40*i, b + 60*j, c});        
+                }
+            }
             shapes.push_back(square);
         }
     }
+    
 
     writeVerticesToGPU(vertices, MAX_SHAPES * MAX_VERTICES_PER_SHAPE);
 
-    // struct shape * square;
-    // std::fstream f("object.obj" , std::ios::in);
-    // std::string str;
-    // square = (struct shape *)malloc(sizeof(struct shape));
 
-    // if (square == NULL)
-    // {
-    //     exit(1);
-    // }
 
-    // initShape(square, vertices, shapes.size());
-
-    // while (getline(f, str))
-    // {
-    //     if (str[0] == 'v')
-    //     {
-            
-    //         std::stringstream strstream;
-    //         strstream << str;
-    //         char v;
-    //         double a, b, c;
-    //         strstream >> v >> a >> b >> c;
-
-    //         std::cout << str << "       a " << a << " b " << b << " c " << c << std::endl;
-
-    //         addVertexToShape(square, (struct location){a, b, c});        
-    //     }
-    // }
-    // shapes.push_back(square);
 
 
     bool exit = false;
@@ -119,40 +131,40 @@ int main(void)
                 switch (ks)
                 {
                     case XK_a:                        
-                        moveShapesLeft(vertices);
-                        break;
-                    case XK_d:
                         moveShapesRight(vertices);
                         break;
+                    case XK_d:
+                        moveShapesLeft(vertices);
+                        break;
                     case XK_w:
-                        moveShapesUp(vertices);
-                        break;
-                    case XK_s:
-                        moveShapesDown(vertices);
-                        break;
-                    case XK_r:
-                        moveShapesOut(vertices);
-                        break;
-                    case XK_f:
                         moveShapesIn(vertices);
                         break;
+                    case XK_s:
+                        moveShapesOut(vertices);
+                        break;
+                    case XK_space:
+                        moveShapesDown(vertices);
+                        break;
+                    case XK_Shift_L:
+                        moveShapesUp(vertices);
+                        break;
                     case XK_q:
-                        rotateShapesCW(vertices, center, a1);
+                        pivotCameraRoll(vertices, -PI/32);
                         break;
                     case XK_e:
-                        rotateShapesCCW(vertices, center, a1);
+                        pivotCameraRoll(vertices, PI/32);
                         break;
                     case XK_i:
-                        pivotCameraPitch(vertices, PI/64);
+                        pivotCameraPitch(vertices, PI/32);
                         break;
                     case XK_k:
-                        pivotCameraPitch(vertices, -PI/64);
+                        pivotCameraPitch(vertices, -PI/32);
                         break;
                     case XK_j:
-                        pivotCameraYaw(vertices, -PI/64);
+                        pivotCameraYaw(vertices, -PI/32);
                         break;
                     case XK_l:
-                        pivotCameraYaw(vertices, PI/64);
+                        pivotCameraYaw(vertices, PI/32);
                         break;
                     case XK_Escape:
                         render = false;

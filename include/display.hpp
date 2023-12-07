@@ -8,7 +8,7 @@
 #define S 1 / tan(fov*0.5*PI / 180.0)
 
 // Far and near clipping planes
-#define far 1.0
+#define far 10000.0
 #define near 0.1
 
 #define dist(x1,y1,x2,y2) sqrt(pow(x2-x1, 2) + pow(y2-y1, 2))

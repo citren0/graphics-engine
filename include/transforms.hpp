@@ -5,10 +5,6 @@
 
 using namespace std;
 
-void scaleHomogenous(double source[][4], int n);
-
-void scaleHomogenous1D(double * source, int n);
-
 void moveShapesLeft(double * targets);
 
 void moveShapesRight(double * targets);
@@ -30,3 +26,5 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
 void pivotCameraPitch(double * targets, double angle);
 
 void pivotCameraYaw(double * targets, double angle);
+
+void pivotCameraRoll(double * targets, double angle);

@@ -12,18 +12,6 @@ using namespace std;
 
 #define MAXVERTICES MAX_SHAPES * MAX_VERTICES_PER_SHAPE
 
-void scaleHomogenous1D(double * source, int n)
-{
-    #pragma omp parallel for
-    for (int i = 0; i < n; i++)
-    {
-        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 0] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
-        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 1] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 1] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
-        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 2] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 2] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
-        source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3] = source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3] / source[i * NUMBER_OF_HOMOGENEOUS_COORDS + 3];
-    }
-}
-
 
 // make the factor of movement changeable.
 void moveShapesLeft(double * targets)
@@ -82,7 +70,7 @@ void moveShapesIn(double * targets)
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             0, 0, 1, 1};
+                             0, 0,-1, 1};
 
     gpuTransform(operation, MAXVERTICES);
 }
@@ -94,7 +82,7 @@ void moveShapesOut(double * targets)
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             0, 0,-1, 1};
+                             0, 0, 1, 1};
 
 
     gpuTransform(operation, MAXVERTICES);
@@ -136,9 +124,9 @@ void rotateShapesCCW(double * targets, struct location center, struct axis axisO
                                  center.x, center.y, center.z, 1};
 
 
-        applyTransform(targets, trans1);
-        applyTransform(targets, rotMat);
-        applyTransform(targets, trans2);
+        gpuTransform(trans1, MAXVERTICES);
+        gpuTransform(rotMat, MAXVERTICES);
+        gpuTransform(trans2, MAXVERTICES);
     }
     else if (axisOfRotation.x)
     {
@@ -161,9 +149,9 @@ void rotateShapesCCW(double * targets, struct location center, struct axis axisO
                                  center.x, center.y, center.z, 1};
 
 
-        applyTransform(targets, trans1);
-        applyTransform(targets, rotMat);
-        applyTransform(targets, trans2);
+        gpuTransform(trans1, MAXVERTICES);
+        gpuTransform(rotMat, MAXVERTICES);
+        gpuTransform(trans2, MAXVERTICES);
     }
     else if (axisOfRotation.y)
     {
@@ -186,9 +174,9 @@ void rotateShapesCCW(double * targets, struct location center, struct axis axisO
                                  center.x, center.y, center.z, 1};
 
 
-        applyTransform(targets, trans1);
-        applyTransform(targets, rotMat);
-        applyTransform(targets, trans2);
+        gpuTransform(trans1, MAXVERTICES);
+        gpuTransform(rotMat, MAXVERTICES);
+        gpuTransform(trans2, MAXVERTICES);
     }
     else
     {
@@ -224,9 +212,9 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
                                  center.x, center.y, center.z, 1};
 
 
-        applyTransform(targets, trans1);
-        applyTransform(targets, rotMat);
-        applyTransform(targets, trans2);
+        gpuTransform(trans1, MAXVERTICES);
+        gpuTransform(rotMat, MAXVERTICES);
+        gpuTransform(trans2, MAXVERTICES);
     }
     else if (axisOfRotation.x)
     {
@@ -249,9 +237,9 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
                                  center.x, center.y, center.z, 1};
 
 
-        applyTransform(targets, trans1);
-        applyTransform(targets, rotMat);
-        applyTransform(targets, trans2);
+        gpuTransform(trans1, MAXVERTICES);
+        gpuTransform(rotMat, MAXVERTICES);
+        gpuTransform(trans2, MAXVERTICES);
     }
     else if (axisOfRotation.y)
     {
@@ -274,9 +262,9 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
                                  center.x, center.y, center.z, 1};
 
 
-        applyTransform(targets, trans1);
-        applyTransform(targets, rotMat);
-        applyTransform(targets, trans2);
+        gpuTransform(trans1, MAXVERTICES);
+        gpuTransform(rotMat, MAXVERTICES);
+        gpuTransform(trans2, MAXVERTICES);
     }
     else
     {
@@ -293,8 +281,7 @@ void pivotCameraPitch(double * targets, double angle)
                              0, -sin(angle), cos(angle), 0,
                              0, 0, 0, 1};
 
-    applyTransform(targets, rotMat);
-    
+    gpuTransform(rotMat, MAXVERTICES);
 }
 
 
@@ -306,6 +293,16 @@ void pivotCameraYaw(double * targets, double angle)
                              sin(angle), 0, cos(angle), 0,
                              0, 0, 0, 1};
 
-    applyTransform(targets, rotMat);
-    
+    gpuTransform(rotMat, MAXVERTICES);
+}
+
+void pivotCameraRoll(double * targets, double angle)
+{
+    double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+                            {cos(angle), -sin(angle), 0, 0, 
+                             sin(angle),  cos(angle), 0, 0,
+                             0, 0, 1, 0,
+                             0, 0, 0, 1};
+
+    gpuTransform(rotMat, MAXVERTICES);
 }

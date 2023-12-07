@@ -50,5 +50,3 @@ void combineVertices(std::vector<struct shape *> targets, double * combinedVerti
 void seperateVertices(std::vector<struct shape *> targets, double * final);
 
 int countVertices(std::vector<struct shape *> targets);
-
-void applyTransform(double * vertices, double transform[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS]);

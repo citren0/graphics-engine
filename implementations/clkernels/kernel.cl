@@ -73,6 +73,20 @@ __kernel void matMatandScale(__global double * operation, __global double * targ
 }
 
 
+__kernel void initializePixels(__global char * pixels, __global unsigned int * n)
+{
+   int i = get_global_id(0);
+
+   int numRows = *n;
+
+	if ((i >= 0) && (i < numRows))
+   {
+      for (int f = 0; f < SCREENWIDTH; f++)
+      {
+         pixels[i * SCREENWIDTH + f] = 0;
+      }
+	}
+}
 
 
 __kernel void displayAndConnect(__global double * homogCurr, __global char * pixels, __global unsigned int * n)
