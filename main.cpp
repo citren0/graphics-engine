@@ -69,39 +69,42 @@ int main(void)
     // }
 
     
-    
-
     int gridCats = 10;
-    for (int i = 0; i < gridCats; i++)
-    {
-        for (int j = 0; j < gridCats; j++)
-        {
-            // When an object is pushed to a vector, it is copied to the heap. It won't go out of scope.
-            struct shape currShape;
 
+    for (int row = 0; row < gridCats; row++)
+    {
+        for (int col = 0; col < gridCats; col++)
+        {
             std::fstream f("object.obj" , std::ios::in);
             std::string str;
-
-            CHK(initShape(&currShape))
-
-            while (getline(f, str))
-            {      
-                std::stringstream strstream;
-                strstream << str;
-                string v;
-                float a, b, c;
-                strstream >> v >> a >> b >> c;
-
-                if (v == "v")
-                {
-                    CHK(addVertexToShape(&currShape, (struct location){a + 40*i, b + 60*j, 0}))  
-                }
-            }
             
-            shapes.push_back(currShape);
+            while (f.peek() != EOF)
+            {
+                struct shape first;
+
+                CHK(initShape(&first))
+
+                while (getline(f, str) && first.numVertices < MAX_VERTICES_PER_SHAPE)
+                {
+                    std::stringstream strstream;
+                    strstream << str;
+                    string v;
+                    float a, b, c;
+                    strstream >> v >> a >> b >> c;
+
+                    if (v == "v")
+                    {
+                        if (addVertexToShape(&first, (struct location){a + 40*row, b + 60*col, c}))
+                        {
+                            break;
+                        }
+                    }
+                }
+
+                shapes.push_back(first);
+            }
         }
     }
-    
 
     writeShapesToGPU(shapes);
 
@@ -179,8 +182,12 @@ int main(void)
 
         if (render)
         {
-            displayVertices(shapes, framebuf);
-            window.putImage();
+            auto start = std::chrono::high_resolution_clock::now();
+                displayVertices(shapes, framebuf);
+                window.putImage();
+            auto elapsed = std::chrono::high_resolution_clock::now() - start;
+            float milliseconds = std::chrono::duration_cast<std::chrono::milliseconds>(elapsed).count();
+            std::cout << "display and putimage took " << milliseconds/1000 << " seconds.\n";
         }
 
     }

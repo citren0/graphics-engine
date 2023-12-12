@@ -42,7 +42,7 @@ __kernel void copyShapes(__global struct shape * source, __global struct shape *
 
 	if ((i >= 0) && (i < numRows))
    {
-		*(dest + i) = *(source + i);        
+		*(dest + i) = *(source + i);
 	}
 
 }

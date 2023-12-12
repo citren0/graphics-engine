@@ -70,7 +70,7 @@ void freeOpenCLKernel(void)
 int initMatMatMultGPU(void)
 {
    cl_int err;
-   long long int sizeFramebuffer = SCREENWIDTH * SCREENHEIGHT * sizeof(float);
+   long long int sizeFramebuffer = SCREENWIDTH * SCREENHEIGHT * sizeof(int);
    long long int sizePixels = SCREENHEIGHT * SCREENWIDTH * sizeof(char);
    long long int sizeShapes = MAX_SHAPES * sizeof(struct shape);
    unsigned int numHomogCoords = NUMBER_OF_HOMOGENEOUS_COORDS;
@@ -183,7 +183,7 @@ int writeShapesToGPU(std::vector<struct shape> shapes)
 {
    cl_int err;
 
-   int bytes = shapes.size() * sizeof(struct shape);
+   long unsigned int bytes = shapes.size() * sizeof(struct shape);
 
    err |= clEnqueueWriteBuffer(queue, dvertices, CL_TRUE, 0, bytes, &shapes[0], 0, NULL, NULL);
 

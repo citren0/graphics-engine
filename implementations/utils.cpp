@@ -81,7 +81,6 @@ int addVertexToShape(struct shape * target, struct location point)
     // Cannot add another vertex to a shape with the max number of vertices.
     if (numVertices >= MAX_VERTICES_PER_SHAPE)
     {
-        printf("OUT OF SPACE. NUM: %d, MAX: %d\n", numVertices, MAX_VERTICES_PER_SHAPE);
         return 1;
     }
 
