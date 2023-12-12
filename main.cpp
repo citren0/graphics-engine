@@ -16,6 +16,7 @@
 #include "./include/transforms.hpp"
 #include "./include/window.hpp"
 #include "./include/gpu.hpp"
+#include "include/shared.hpp"
 
 // 33 fps lock.
 #define FRAMETIME 30000
@@ -33,40 +34,41 @@ int main(void)
 
     window.init_x();
 
-    initMatMatMultGPU(MAX_VERTICES_PER_SHAPE * MAX_SHAPES);
+    initMatMatMultGPU();
 
     framebuf = window.getFrameBuffer();
 
-    std::vector<struct shape *> shapes;
+    std::vector<struct shape> shapes;
 
-    double * vertices = initVertices();
-
-    // struct shape * square;
+    
     // int gridSize = 1000;
     // for (int i = 0; i < gridSize; i++)
     // {
     //     for (int f = 0; f < gridSize; f++)
     //     {
-    //         square = (struct shape *)malloc(sizeof(struct shape));
+    //         struct shape square;
 
-    //         if (square == NULL)
-    //         {
-    //             printf("Malloc failed.\n");
-    //             exit(1);
-    //         }
+    //         CHK(initShape(&square))
 
-    //         initShape(square, vertices, shapes.size());
+    //         CHK(addVertexToShape(&square, (struct location){(float)0 + 5*f, 0, (float)0 + 5*i}))
+    //         CHK(addVertexToShape(&square, (struct location){(float)5 + 5*f, 0, (float)5 + 5*i}))
+    //         CHK(addVertexToShape(&square, (struct location){(float)0 + 5*f, 0, (float)5 + 5*i}))
+    //         CHK(addVertexToShape(&square, (struct location){(float)5 + 5*f, 0, (float)0 + 5*i}))
 
-    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)15 + 5*i});
-    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)20 + 5*i});
-    //         addVertexToShape(square, (struct location){(double)0 + 5*f, 0, (double)20 + 5*i});
-    //         addVertexToShape(square, (struct location){(double)5 + 5*f, 0, (double)15 + 5*i});
+    //         CHK(calculateNormal(&square))
+
+    //         CHK(setShapeColor(&square, (struct rgb){255, 0, 0}))
+
+    //         CHK(connectShape(&square, 0, 2))
+    //         CHK(connectShape(&square, 2, 1))
+    //         CHK(connectShape(&square, 1, 3))
+    //         CHK(connectShape(&square, 3, 0))
 
     //         shapes.push_back(square);
     //     }
     // }
 
-    struct shape * square;
+    
     
 
     int gridCats = 10;
@@ -74,38 +76,34 @@ int main(void)
     {
         for (int j = 0; j < gridCats; j++)
         {
+            // When an object is pushed to a vector, it is copied to the heap. It won't go out of scope.
+            struct shape currShape;
+
             std::fstream f("object.obj" , std::ios::in);
             std::string str;
 
-            square = (struct shape *)malloc(sizeof(struct shape));
-
-            if (square == NULL)
-            {
-                exit(1);
-            }
-
-            initShape(square, vertices, shapes.size());
+            CHK(initShape(&currShape))
 
             while (getline(f, str))
-            {
-                if (str[0] == 'v')
-                {
-                    
-                    std::stringstream strstream;
-                    strstream << str;
-                    char v;
-                    double a, b, c;
-                    strstream >> v >> a >> b >> c;
+            {      
+                std::stringstream strstream;
+                strstream << str;
+                string v;
+                float a, b, c;
+                strstream >> v >> a >> b >> c;
 
-                    addVertexToShape(square, (struct location){a + 40*i, b + 60*j, c});        
+                if (v == "v")
+                {
+                    CHK(addVertexToShape(&currShape, (struct location){a + 40*i, b + 60*j, 0}))  
                 }
             }
-            shapes.push_back(square);
+            
+            shapes.push_back(currShape);
         }
     }
     
 
-    writeVerticesToGPU(vertices, MAX_SHAPES * MAX_VERTICES_PER_SHAPE);
+    writeShapesToGPU(shapes);
 
 
 
@@ -131,40 +129,40 @@ int main(void)
                 switch (ks)
                 {
                     case XK_a:                        
-                        moveShapesRight(vertices);
+                        moveShapesRight(1, shapes.size());
                         break;
                     case XK_d:
-                        moveShapesLeft(vertices);
+                        moveShapesLeft(1, shapes.size());
                         break;
                     case XK_w:
-                        moveShapesIn(vertices);
+                        moveShapesIn(1, shapes.size());
                         break;
                     case XK_s:
-                        moveShapesOut(vertices);
+                        moveShapesOut(1, shapes.size());
                         break;
                     case XK_space:
-                        moveShapesDown(vertices);
+                        moveShapesDown(1, shapes.size());
                         break;
                     case XK_Shift_L:
-                        moveShapesUp(vertices);
+                        moveShapesUp(1, shapes.size());
                         break;
                     case XK_q:
-                        pivotCameraRoll(vertices, -PI/32);
+                        pivotCameraRoll(-PI/32, shapes.size());
                         break;
                     case XK_e:
-                        pivotCameraRoll(vertices, PI/32);
+                        pivotCameraRoll(PI/32, shapes.size());
                         break;
                     case XK_i:
-                        pivotCameraPitch(vertices, PI/32);
+                        pivotCameraPitch(PI/32, shapes.size());
                         break;
                     case XK_k:
-                        pivotCameraPitch(vertices, -PI/32);
+                        pivotCameraPitch(-PI/32, shapes.size());
                         break;
                     case XK_j:
-                        pivotCameraYaw(vertices, -PI/32);
+                        pivotCameraYaw(-PI/32, shapes.size());
                         break;
                     case XK_l:
-                        pivotCameraYaw(vertices, PI/32);
+                        pivotCameraYaw(PI/32, shapes.size());
                         break;
                     case XK_Escape:
                         render = false;
@@ -181,7 +179,7 @@ int main(void)
 
         if (render)
         {
-            displayVertices(shapes, vertices, framebuf);
+            displayVertices(shapes, framebuf);
             window.putImage();
         }
 

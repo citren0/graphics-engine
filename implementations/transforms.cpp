@@ -7,86 +7,87 @@
 #include "../include/transforms.hpp"
 #include "../include/utils.hpp"
 #include "../include/gpu.hpp"
-#include "../include/constants.hpp"
+#include "../include/shared.hpp"
+
 
 // make the factor of movement changeable.
-void moveShapesLeft(double * targets)
+void moveShapesLeft(float amount, int numShapes)
 {
     // Matrices are stored with the vertical vectors contiguous in memory.
-    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] =
+    float operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] =
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             1, 0, 0, 1};
+                             amount, 0, 0, 1};
 
-    gpuTransform(operation, MAXVERTICES);
+    gpuTransform(operation, numShapes);
 }
 
 
-void moveShapesRight(double * targets)
+void moveShapesRight(float amount, int numShapes)
 {
-    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                            -1, 0, 0, 1};
+                            -amount, 0, 0, 1};
 
-    gpuTransform(operation, MAXVERTICES);
+    gpuTransform(operation, numShapes);
 }
 
 
-void moveShapesUp(double * targets)
+void moveShapesUp(float amount, int numShapes)
 {
-    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             0, 1, 0, 1};
+                             0, amount, 0, 1};
 
-    gpuTransform(operation, MAXVERTICES);
+    gpuTransform(operation, numShapes);
 
 }
 
 
-void moveShapesDown(double * targets)
+void moveShapesDown(float amount, int numShapes)
 {
-    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             0,-1, 0, 1};
+                             0,-amount, 0, 1};
 
-    gpuTransform(operation, MAXVERTICES);
+    gpuTransform(operation, numShapes);
 }
 
 
-void moveShapesIn(double * targets)
+void moveShapesIn(float amount, int numShapes)
 {
-    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             0, 0,-1, 1};
+                             0, 0,-amount, 1};
 
-    gpuTransform(operation, MAXVERTICES);
+    gpuTransform(operation, numShapes);
 }
 
 
-void moveShapesOut(double * targets)
+void moveShapesOut(float amount, int numShapes)
 {
-    double operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float operation[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {1, 0, 0, 0,
                              0, 1, 0, 0,
                              0, 0, 1, 0,
-                             0, 0, 1, 1};
+                             0, 0, amount, 1};
 
 
-    gpuTransform(operation, MAXVERTICES);
+    gpuTransform(operation, numShapes);
 }
 
 
 // Will calculate the 3D center of two vertices.
-void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3])
+void calculateCenterOfVertices(float vert1[4], float vert2[4], float result[3])
 {
     result[0] = (vert1[0] + vert2[0]) / 2;
     result[1] = (vert1[1] + vert2[1]) / 2;
@@ -95,84 +96,83 @@ void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3
 
 
 // Rotate the shape around (h,k)
-void rotateShapesCCW(double * targets, struct location center, struct axis axisOfRotation)
+void rotateShapesCCW(struct location center, struct axis axisOfRotation, float thetaRads, int numShapes)
 {
-    double thetaRads = PI/64.0;
 
     if (axisOfRotation.z)
     {
-        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {cos(thetaRads), sin(thetaRads), 0, 0, 
                                  -sin(thetaRads), cos(thetaRads), 0, 0,
                                  0, 0, 1, 0,
                                  0, 0, 0, 1};
         
-        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  -center.x, -center.y, -center.z, 1};
 
-        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  center.x, center.y, center.z, 1};
 
 
-        gpuTransform(trans1, MAXVERTICES);
-        gpuTransform(rotMat, MAXVERTICES);
-        gpuTransform(trans2, MAXVERTICES);
+        gpuTransform(trans1, numShapes);
+        gpuTransform(rotMat, numShapes);
+        gpuTransform(trans2, numShapes);
     }
     else if (axisOfRotation.x)
     {
-        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0, 
                                  0, cos(thetaRads), sin(thetaRads), 0,
                                  0, -sin(thetaRads), cos(thetaRads), 0,
                                  0, 0, 0, 1};
 
-        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  -center.x, -center.y, -center.z, 1};
 
-        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  center.x, center.y, center.z, 1};
 
 
-        gpuTransform(trans1, MAXVERTICES);
-        gpuTransform(rotMat, MAXVERTICES);
-        gpuTransform(trans2, MAXVERTICES);
+        gpuTransform(trans1, numShapes);
+        gpuTransform(rotMat, numShapes);
+        gpuTransform(trans2, numShapes);
     }
     else if (axisOfRotation.y)
     {
-        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {cos(thetaRads), 0, -sin(thetaRads), 0, 
                                  0, 1, 0, 0,
                                  sin(thetaRads), 0, cos(thetaRads), 0,
                                  0, 0, 0, 1};
 
-        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  -center.x, -center.y, -center.z, 1};
 
-        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  center.x, center.y, center.z, 1};
 
 
-        gpuTransform(trans1, MAXVERTICES);
-        gpuTransform(rotMat, MAXVERTICES);
-        gpuTransform(trans2, MAXVERTICES);
+        gpuTransform(trans1, numShapes);
+        gpuTransform(rotMat, numShapes);
+        gpuTransform(trans2, numShapes);
     }
     else
     {
@@ -183,84 +183,83 @@ void rotateShapesCCW(double * targets, struct location center, struct axis axisO
 }
 
 
-void rotateShapesCW(double * targets, struct location center, struct axis axisOfRotation)
+void rotateShapesCW(struct location center, struct axis axisOfRotation, float thetaRads, int numShapes)
 {
-    double thetaRads = -PI/72.0;
 
     if (axisOfRotation.z)
     {
-        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {cos(thetaRads), sin(thetaRads), 0, 0, 
                                  -sin(thetaRads), cos(thetaRads), 0, 0,
                                  0, 0, 1, 0,
                                  0, 0, 0, 1};
         
-        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  -center.x, -center.y, -center.z, 1};
 
-        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  center.x, center.y, center.z, 1};
 
 
-        gpuTransform(trans1, MAXVERTICES);
-        gpuTransform(rotMat, MAXVERTICES);
-        gpuTransform(trans2, MAXVERTICES);
+        gpuTransform(trans1, numShapes);
+        gpuTransform(rotMat, numShapes);
+        gpuTransform(trans2, numShapes);
     }
     else if (axisOfRotation.x)
     {
-        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0, 
                                  0, cos(thetaRads), sin(thetaRads), 0,
                                  0, -sin(thetaRads), cos(thetaRads), 0,
                                  0, 0, 0, 1};
 
-        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  -center.x, -center.y, -center.z, 1};
 
-        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  center.x, center.y, center.z, 1};
 
 
-        gpuTransform(trans1, MAXVERTICES);
-        gpuTransform(rotMat, MAXVERTICES);
-        gpuTransform(trans2, MAXVERTICES);
+        gpuTransform(trans1, numShapes);
+        gpuTransform(rotMat, numShapes);
+        gpuTransform(trans2, numShapes);
     }
     else if (axisOfRotation.y)
     {
-        double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {cos(thetaRads), 0, -sin(thetaRads), 0, 
                                  0, 1, 0, 0,
                                  sin(thetaRads), 0, cos(thetaRads), 0,
                                  0, 0, 0, 1};
 
-        double trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans1[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  -center.x, -center.y, -center.z, 1};
 
-        double trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+        float trans2[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                                 {1, 0, 0, 0,
                                  0, 1, 0, 0,
                                  0, 0, 1, 0,
                                  center.x, center.y, center.z, 1};
 
 
-        gpuTransform(trans1, MAXVERTICES);
-        gpuTransform(rotMat, MAXVERTICES);
-        gpuTransform(trans2, MAXVERTICES);
+        gpuTransform(trans1, numShapes);
+        gpuTransform(rotMat, numShapes);
+        gpuTransform(trans2, numShapes);
     }
     else
     {
@@ -269,36 +268,36 @@ void rotateShapesCW(double * targets, struct location center, struct axis axisOf
 }
 
 
-void pivotCameraPitch(double * targets, double angle)
+void pivotCameraPitch(float angle, int numShapes)
 {
-    double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {1, 0, 0, 0, 
                              0, cos(angle), sin(angle), 0,
                              0, -sin(angle), cos(angle), 0,
                              0, 0, 0, 1};
 
-    gpuTransform(rotMat, MAXVERTICES);
+    gpuTransform(rotMat, numShapes);
 }
 
 
-void pivotCameraYaw(double * targets, double angle)
+void pivotCameraYaw(float angle, int numShapes)
 {
-    double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {cos(angle), 0, -sin(angle), 0, 
                              0, 1, 0, 0,
                              sin(angle), 0, cos(angle), 0,
                              0, 0, 0, 1};
 
-    gpuTransform(rotMat, MAXVERTICES);
+    gpuTransform(rotMat, numShapes);
 }
 
-void pivotCameraRoll(double * targets, double angle)
+void pivotCameraRoll(float angle, int numShapes)
 {
-    double rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+    float rotMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
                             {cos(angle), -sin(angle), 0, 0, 
                              sin(angle),  cos(angle), 0, 0,
                              0, 0, 1, 0,
                              0, 0, 0, 1};
 
-    gpuTransform(rotMat, MAXVERTICES);
+    gpuTransform(rotMat, numShapes);
 }

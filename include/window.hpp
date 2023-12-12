@@ -8,9 +8,6 @@
 #include <sys/shm.h>
 #include <X11/extensions/XShm.h>
 
-#include "constants.hpp"
-
-
 class X11Window
 {
     private:

@@ -10,7 +10,7 @@
 
 
 
-double projMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
+float projMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] = 
         {S, 0, 0, 0,
          0, S, 0, 0,
          0, 0, -(far+near)/(far-near), -1,
@@ -18,7 +18,7 @@ double projMat[NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS] =
 
 
 
-double * getProjMat()
+float * getProjMat()
 {
     return projMat;
 }
@@ -34,15 +34,15 @@ void initBuffer(char buf[SCREENHEIGHT * SCREENWIDTH])
 }
 
 
-void displayVertices(vector<struct shape *> shapes, double * vertices, int * framebuf)
+void displayVertices(vector<struct shape> shapes, int * framebuf)
 {    
     int maxVerticesToConsider = shapes.size() * MAX_VERTICES_PER_SHAPE;
 
     // Transform the vertices and scale homogeneous.
-    gpuMatMatandScale(getProjMat(), maxVerticesToConsider);
+    gpuMatMatandScale(getProjMat(), shapes.size());
 
     // Draw vertices of the shapes.
-    gpuDisplay(maxVerticesToConsider);
+    gpuDisplay(shapes.size());
 
     // Assign color values to framebuffer
     gpuPopulateFramebuffer(framebuf);

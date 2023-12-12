@@ -18,7 +18,7 @@
 #define KERNEL_FUNC_BOTH "matMatandScale"
 #define KERNEL_FUNC_DISPLAYANDCONNECT "displayAndConnect"
 #define KERNEL_FUNC_POPULATEFRAMEBUFFER "populateFramebuffer"
-#define KERNEL_FUNC_COPYMATRIX "copyMatrix" 
+#define KERNEL_FUNC_COPYMATRIX "copyShapes" 
 #define KERNEL_FUNC_INITIALIZEPIXELS "initializePixels"
 
 
@@ -63,13 +63,16 @@ void freeOpenCLKernel(void)
 }
 
 
-int initMatMatMultGPU(unsigned int numRows)
+
+// SET NUMROWS CORRECTLY TO THE NUMBER OF SHAPES????
+
+
+int initMatMatMultGPU(void)
 {
    cl_int err;
-   long long int numElements = numRows * NUMBER_OF_HOMOGENEOUS_COORDS;
-   long long int sizeFramebuffer = SCREENWIDTH * SCREENHEIGHT * sizeof(double);
+   long long int sizeFramebuffer = SCREENWIDTH * SCREENHEIGHT * sizeof(float);
    long long int sizePixels = SCREENHEIGHT * SCREENWIDTH * sizeof(char);
-   size_t bytes = numElements * sizeof(double);
+   long long int sizeShapes = MAX_SHAPES * sizeof(struct shape);
    unsigned int numHomogCoords = NUMBER_OF_HOMOGENEOUS_COORDS;
 
    device = create_device();
@@ -79,15 +82,15 @@ int initMatMatMultGPU(unsigned int numRows)
 
 
    // Allocate GPU memory
-   dprojection = clCreateBuffer(context, CL_MEM_READ_WRITE, (NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double)), NULL, NULL);
-   dtransform = clCreateBuffer(context, CL_MEM_READ_WRITE, (NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double)), NULL, NULL);
-   dvertices = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, NULL);
-   dprojected = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, NULL);
-   ddestination = clCreateBuffer(context, CL_MEM_READ_WRITE, bytes, NULL, NULL);
+   dprojection = clCreateBuffer(context, CL_MEM_READ_WRITE, (NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(float)), NULL, NULL);
+   dtransform = clCreateBuffer(context, CL_MEM_READ_WRITE, (NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(float)), NULL, NULL);
+   dvertices = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeShapes, NULL, NULL); // HOLDS SHAPES
+   dprojected = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeShapes, NULL, NULL); // HOLDS SHAPES
+   ddestination = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeShapes, NULL, NULL); // HOLDS SHAPES
    dpixels = clCreateBuffer(context, CL_MEM_READ_WRITE, sizePixels, NULL, NULL);
    dframebuf = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeFramebuffer, NULL, NULL);
-   dnumRows = clCreateBuffer(context, CL_MEM_READ_WRITE, sizeof(unsigned int), NULL, NULL);
-
+   dnumRows = clCreateBuffer(context, CL_MEM_READ_ONLY, sizeof(unsigned int), NULL, NULL);
+  
 
    // Create Each kernel.
    kernelTransform = clCreateKernel(program, KERNEL_FUNC_TRANSFORM, &err);
@@ -108,11 +111,11 @@ int initMatMatMultGPU(unsigned int numRows)
 
 
    // Determine local and global size for each kernel.
-   global_sizeTransform = ceil((float) numElements / local_sizeTransform) * local_sizeTransform;
-   global_sizeBoth = ceil((float) numElements / local_sizeBoth) * local_sizeBoth;
-   global_sizeDisplayandConnect = ceil((float) numElements / local_sizeDisplayandConnect) * local_sizeDisplayandConnect;
+   global_sizeTransform = ceil((float) MAX_SHAPES * MAX_VERTICES_PER_SHAPE / local_sizeTransform) * local_sizeTransform;
+   global_sizeBoth = ceil((float) MAX_SHAPES * MAX_VERTICES_PER_SHAPE / local_sizeBoth) * local_sizeBoth;
+   global_sizeDisplayandConnect = ceil((float) MAX_SHAPES * MAX_VERTICES_PER_SHAPE / local_sizeDisplayandConnect) * local_sizeDisplayandConnect;
    global_sizePopulateFramebuffer = ceil((float) SCREENHEIGHT / local_sizeDisplayandConnect) * local_sizeDisplayandConnect;
-   global_sizeCopyMatrix = ceil((float) numElements / local_sizeCopyMatrix) * local_sizeCopyMatrix;
+   global_sizeCopyMatrix = ceil((float) MAX_SHAPES / local_sizeCopyMatrix) * local_sizeCopyMatrix;
    global_sizeInitializePixels = ceil((float) SCREENHEIGHT / local_sizeInitializePixels) * local_sizeInitializePixels;
 
 
@@ -151,7 +154,7 @@ int initMatMatMultGPU(unsigned int numRows)
 int gpuInitializePixels(void)
 {
    clock_t begin, end;
-   double time_spent;
+   float time_spent;
    
    cl_int err = 0;
 
@@ -169,20 +172,20 @@ int gpuInitializePixels(void)
    CHKERR(err, 90)
 
    end = clock();
-   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+   time_spent = (float)(end - begin) / CLOCKS_PER_SEC;
    printf("time spent initializing and executing initializePixels: %f\n\n\n", time_spent);
 
    return 0;
 }
 
 
-int writeVerticesToGPU(double * vertices, int n)
+int writeShapesToGPU(std::vector<struct shape> shapes)
 {
    cl_int err;
 
-   int bytes = n * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double);
+   int bytes = shapes.size() * sizeof(struct shape);
 
-   err |= clEnqueueWriteBuffer(queue, dvertices, CL_TRUE, 0, bytes, vertices, 0, NULL, NULL);
+   err |= clEnqueueWriteBuffer(queue, dvertices, CL_TRUE, 0, bytes, &shapes[0], 0, NULL, NULL);
 
    CHKERR(err, 1);
 
@@ -190,10 +193,10 @@ int writeVerticesToGPU(double * vertices, int n)
 }
 
 
-int gpuCopyDestToOutput()
+int gpuCopyDestToOutput(unsigned int numShapes)
 {
    clock_t begin, end;
-   double time_spent;
+   float time_spent;
    
    cl_int err = 0;
 
@@ -205,7 +208,7 @@ int gpuCopyDestToOutput()
    err |= clSetKernelArg(kernelCopyMatrix, 1, sizeof(cl_mem), &dvertices);
    err |= clSetKernelArg(kernelCopyMatrix, 2, sizeof(cl_mem), &dnumRows);
 
-   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numRows, 0, NULL, NULL);
+   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numShapes, 0, NULL, NULL);
 
    err |= clEnqueueNDRangeKernel(queue, kernelCopyMatrix, 1, NULL, &global_sizeCopyMatrix, &local_sizeCopyMatrix, 0, NULL, &event); 
 
@@ -215,25 +218,25 @@ int gpuCopyDestToOutput()
    CHKERR(err, 90)
 
    end = clock();
-   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+   time_spent = (float)(end - begin) / CLOCKS_PER_SEC;
    printf("time spent initializing and executing copydesttooutput: %f\n\n\n", time_spent);
 
    return 0;
 }
 
 
-int gpuTransform(double * transform, unsigned int numRows)
+int gpuTransform(float * transform, unsigned int numShapes)
 {
    clock_t begin, end;
-   double time_spent;
-   
-   unsigned int sizeOfTransform = NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double);
-
+   float time_spent;
    cl_int err = 0;
+
+   unsigned int sizeOfTransform = NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(float);
+   unsigned int numVertices = numShapes * MAX_VERTICES_PER_SHAPE;
 
    begin = clock();
 
-   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numRows, 0, NULL, NULL);
+   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numVertices, 0, NULL, NULL);
 
    err |= clEnqueueWriteBuffer(queue, dtransform, CL_TRUE, 0, sizeOfTransform, transform, 0, NULL, NULL);
 
@@ -245,35 +248,30 @@ int gpuTransform(double * transform, unsigned int numRows)
    CHKERR(err, 236)
 
    end = clock();
-   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+   time_spent = (float)(end - begin) / CLOCKS_PER_SEC;
    printf("time spent initializing and executing transform: %f\n\n\n", time_spent);
 
-   gpuCopyDestToOutput();
+   gpuCopyDestToOutput(numShapes);
 
    return 0;
 }
 
 
-int gpuMatMatandScale(double * projection, unsigned int numRows)
+int gpuMatMatandScale(float * projection, unsigned int numShapes)
 {
    clock_t begin, end;
-   double time_spent;
-   
-
-   long long int numElements = numRows * NUMBER_OF_HOMOGENEOUS_COORDS;
-   size_t bytes = numElements * sizeof(double);
+   float time_spent;
    cl_int err = 0;
+
+   unsigned int numVertices = numShapes * MAX_VERTICES_PER_SHAPE;
 
    begin = clock();
 
-   double arrr[NUMBER_OF_HOMOGENEOUS_COORDS * 1];
-   err |= clEnqueueReadBuffer(queue, dvertices, CL_TRUE, 0, NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double), arrr, 0, NULL, NULL);
-   printMat(arrr, 1);
-
-
-   err |= clEnqueueWriteBuffer(queue, dprojection, CL_TRUE, 0, (NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(double)), projection, 0, NULL, NULL);
-   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numRows, 0, NULL, NULL);
+   err |= clEnqueueWriteBuffer(queue, dprojection, CL_TRUE, 0, (NUMBER_OF_HOMOGENEOUS_COORDS * NUMBER_OF_HOMOGENEOUS_COORDS * sizeof(float)), projection, 0, NULL, NULL);
+   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numVertices, 0, NULL, NULL);
    
+   CHKERR(err, 4)
+
    err |= clEnqueueNDRangeKernel(queue, kernelBoth, 1, NULL, &global_sizeBoth, &local_sizeBoth, 0, NULL, &event); 
 
    err |= clWaitForEvents(1, &event);
@@ -282,27 +280,29 @@ int gpuMatMatandScale(double * projection, unsigned int numRows)
    CHKERR(err, 5)
 
    end = clock();
-   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+   time_spent = (float)(end - begin) / CLOCKS_PER_SEC;
    printf("time spent initializing and executing matmatandscale: %f\n\n\n", time_spent);
 
    return 0;
 }
 
 
-int gpuDisplay(unsigned int numRows)
+int gpuDisplay(unsigned int numShapes)
 {
    clock_t begin, end;
-   double time_spent;
+   float time_spent;
 
    unsigned int pixelsSize = SCREENWIDTH * SCREENHEIGHT * sizeof(char);
    
    cl_int err = 0;
 
+   unsigned int numVertices = numShapes * MAX_VERTICES_PER_SHAPE;
+
    gpuInitializePixels();
 
    begin = clock();
 
-   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numRows, 0, NULL, NULL);
+   err |= clEnqueueWriteBuffer(queue, dnumRows, CL_TRUE, 0, sizeof(unsigned int), &numVertices, 0, NULL, NULL);
    
    err |= clEnqueueNDRangeKernel(queue, kernelDisplayandConnect, 1, NULL, &global_sizeDisplayandConnect, &local_sizeDisplayandConnect, 0, NULL, &event); 
 
@@ -312,7 +312,7 @@ int gpuDisplay(unsigned int numRows)
    CHKERR(err, 6)
 
    end = clock();
-   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+   time_spent = (float)(end - begin) / CLOCKS_PER_SEC;
    printf("time spent initializing and executing display: %f\n\n\n", time_spent);
 
    return 0;
@@ -322,7 +322,7 @@ int gpuDisplay(unsigned int numRows)
 int gpuPopulateFramebuffer(int * framebuffer)
 {
    clock_t begin, end;
-   double time_spent;
+   float time_spent;
    
    cl_int err = 0;
 
@@ -340,7 +340,7 @@ int gpuPopulateFramebuffer(int * framebuffer)
    CHKERR(err, 7)
 
    end = clock();
-   time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
+   time_spent = (float)(end - begin) / CLOCKS_PER_SEC;
    printf("time spent initializing and executing populateframebuffer: %f\n\n\n", time_spent);
 
    return 0;

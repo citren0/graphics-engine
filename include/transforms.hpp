@@ -1,30 +1,42 @@
 #pragma once
 #include "utils.hpp"
 #include <vector>
-#include "constants.hpp"
+#include "shared.hpp"
 
 using namespace std;
 
-void moveShapesLeft(double * targets);
 
-void moveShapesRight(double * targets);
+#include <iostream>
+#include <string>
+#include <cmath>
+#include <vector>
 
-void moveShapesUp(double * targets);
+#include "../include/transforms.hpp"
+#include "../include/utils.hpp"
+#include "../include/gpu.hpp"
+#include "../include/shared.hpp"
 
-void moveShapesDown(double * targets);
+// make the factor of movement changeable.
+void moveShapesLeft(float amount, int numShapes);
 
-void moveShapesIn(double * targets);
+void moveShapesRight(float amount, int numShapes);
 
-void moveShapesOut(double * targets);
+void moveShapesUp(float amount, int numShapes);
 
-void calculateCenterOfVertices(double vert1[4], double vert2[4], double result[3]);
+void moveShapesDown(float amount, int numShapes);
 
-void rotateShapesCCW(double * targets, struct location center, struct axis axisOfRotation);
+void moveShapesIn(float amount, int numShapes);
 
-void rotateShapesCW(double * targets, struct location center, struct axis axisOfRotation);
+void moveShapesOut(float amount, int numShapes);
 
-void pivotCameraPitch(double * targets, double angle);
+void calculateCenterOfVertices(float vert1[4], float vert2[4], float result[3]);
 
-void pivotCameraYaw(double * targets, double angle);
+void rotateShapesCCW(struct location center, struct axis axisOfRotation, float thetaRads, int numShapes);
 
-void pivotCameraRoll(double * targets, double angle);
+void rotateShapesCW(struct location center, struct axis axisOfRotation, float thetaRads, int numShapes);
+
+void pivotCameraPitch(float angle, int numShapes);
+
+void pivotCameraYaw(float angle, int numShapes);
+
+void pivotCameraRoll(float angle, int numShapes);
