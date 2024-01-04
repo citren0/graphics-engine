@@ -14,7 +14,8 @@ The vertices of all objects displayed are kept in a matrix, a vector of vectors.
 These coordinates are transformed by other matrices to perform simple operations like translation and rotation.\
 By transforming all objects in the coordinate space, the graphics engine mimicks movement of the camera, which is actually locked at the XYZ coordinate (0, 0, 0).
 
-![alt text](https://courses.cs.washington.edu/courses/cse557/97wi/notes/xforms/diagram/homogeneous.gif)\
+![image](https://github.com/citren0/graphics-engine/assets/42524057/c8cb379c-8c71-4c73-96db-edb381da6b9d)\
+Source: [https://courses.cs.washington.edu/courses/cse557/97wi/notes/xforms/projective.html](https://courses.cs.washington.edu/courses/cse557/97wi/notes/xforms/projective.html)\
 This is an intuitive visual which shows the "screen" at $w$ and a ray from the origin (camera) to the object which is being projected.
 
 This perspective projection is achieved through the "transformation matrix."
