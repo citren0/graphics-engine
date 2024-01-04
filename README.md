@@ -15,11 +15,11 @@ These coordinates are transformed by other matrices to perform simple operations
 By transforming all objects in the coordinate space, the graphics engine mimicks movement of the camera, which is actually locked at the XYZ coordinate (0, 0, 0).
 
 ![alt text](https://courses.cs.washington.edu/courses/cse557/97wi/notes/xforms/diagram/homogeneous.gif)\
-This is an intuitive visual which shows the "screen" at $\mathbb{w}$ and a ray from the origin (camera) to the object which is being projected.
+This is an intuitive visual which shows the "screen" at $w$ and a ray from the origin (camera) to the object which is being projected.
 
 This perspective projection is achieved through the "transformation matrix."
 ![image](https://github.com/citren0/graphics-engine/assets/42524057/0fe789f4-356a-433c-89c4-a36391e3eaef)\
-This transformation is applied to all vertices and results in their coordinates projected upon the "screen" at $\mathbb{w} = 1$
+This transformation is applied to all vertices and results in their coordinates projected upon the "screen" at $w = 1$
 
 ## Build
 $ make
