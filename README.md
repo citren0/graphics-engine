@@ -5,9 +5,6 @@ It requires a running X11 server, and openCL.
 The program is currently set up to read the .obj file in the root directory of the repository, and clone it, creating 100 copies of the object.\
 The current object is a cat, and it will be cloned into a small army.
 
-This is one of my most comprehensive projects, and I applied knowledge from many fields of experience to create it.\
-I appreciate you checking it out.
-
 ## Principles
 This graphics engine relies on the algebraic concept of coordinate transformations.\
 The vertices of all objects displayed are kept in a matrix, a vector of vectors. Each point has an X, Y, Z, and homogeneous coordinate.\
