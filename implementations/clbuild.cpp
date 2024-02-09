@@ -4,6 +4,9 @@
 #include "../include/gpu.hpp"
 
 
+// OpenCL Building based off of rsnemmen's examples.
+// https://github.com/rsnemmen/OpenCL-examples
+
 cl_device_id create_device() {
 
    cl_platform_id platform;
