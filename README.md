@@ -1,6 +1,6 @@
 # graphics engine
 This is a primitive C++ rendering graphics engine.\
-It requires a running X11 server, and openCL.
+It requires a running X11 server, and OpenCL.
 
 The program is currently set up to read the .obj file in the root directory of the repository, and clone it, creating 100 copies of the object.\
 The current object is a cat, and it will be cloned into a small army.
@@ -18,6 +18,8 @@ This is an intuitive visual which shows the "screen" at $w$ and a ray from the o
 This perspective projection is achieved through the "transformation matrix."
 ![image](https://github.com/citren0/graphics-engine/assets/42524057/0fe789f4-356a-433c-89c4-a36391e3eaef)\
 This transformation is applied to all vertices and results in their coordinates projected upon the "screen" at $w = 1$
+
+Further information can be found at my blog: [blog.cam-davis.com](blog.cam-davis.com)
 
 ## Build
 $ make
